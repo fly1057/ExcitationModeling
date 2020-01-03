@@ -66,7 +66,7 @@ class Model():
              self.Eqpp[-1]]).reshape(-1, 1)  #[Edp,Eqp,Edpp,Eqpp]
         self.pE = np.array([0, 0, 0, 0]).reshape(
             -1, 1)  #-1表示我懒得计算该填什么数字，由python通过原数组和其他的值3推测出来。
-        self.Y = np.array([0, 0]).reshape(-1, 1)  #ud,uq
+        self.Y = np.array([0, 0]).reshape(-1, 1)  #ud,uq  
         self.A = np.array([[-1/self.Tq0p , 0,0,0],\
                            [0 , -self.KG(self.a,self.b,self.n,self.Eqp[-1])/self.Td0p,0,0],\
                            [(1/self.Tq0pp-1/self.Tq0p),0,-1/self.Tq0pp , 0],\

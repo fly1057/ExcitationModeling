@@ -27,7 +27,9 @@ class Model():
                            [(1/self.Tq0pp-1/self.Tq0p),0,-1/self.Tq0p , 0],\
                            [0 , (1/self.Td0pp-self.KG(self.a,self.b,self.n,self.Eqpp)/self.Td0p),0,-1/self.Td0pp ]
                            ])
-        self.B = np.array([0,1/self.Td0p,0,1/self.Td0p])
+        self.B = np.array([0, 1 / self.Td0p, 0, 1 / self.Td0p])
+        print(self.A)
+        print(self.B)
 
     def KG(self,a,b,n,Eqpp):
         return a+b*Eqpp**n

@@ -36,12 +36,8 @@ class Model():
 
     def DefaultParametersetting(self):
         self.dt = 0.01
-        self.t0 = 0.0
-        self.y0 = 3.0
-        self.t = self.t0
-        self.y = self.y0
-        self.tseq = []
-        self.yseq = []
+        self.tseq = [0]
+        self.yseq = [3.0]
         self.tseq_original = np.arange(0, 1, 0.01)
         self.yseq_original = self.tseq_original**3 - self.tseq_original**2 + 3
         self.Tq0p = 0.9
@@ -54,45 +50,33 @@ class Model():
         self.ud = [0]
         self.uq = [0.95]
         self.KG0 = self.KG(self.a, self.b, self.n, self.uq[0])
-        self.Efd = [self.uq[0]*self.KG0]
+        self.Efd = [self.uq[0] * self.KG0]
+        self.Kp = 500
         self.Edp = [0]
         self.Eqp = [self.uq[0]]
         self.Edpp = [0]
         self.Eqpp = [self.uq[0]]
-        self.uref = [self.ParameterInitial()]
+        self.uref = [self.Efd[0]/self.Kp+np.sqrt(self.ud[0]**2 + self.uq[0]**2)]
 
-        self.E = np.array(
-            [self.Edp[-1], self.Eqp[-1], self.Edpp[-1],
-             self.Eqpp[-1]]).reshape(-1, 1)  #[Edp,Eqp,Edpp,Eqpp]
-        self.pE = np.array([0, 0, 0, 0]).reshape(
-            -1, 1)  #-1表示我懒得计算该填什么数字，由python通过原数组和其他的值3推测出来。
-        self.Y = np.array([0, 0]).reshape(-1, 1)  #ud,uq
-        self.A = np.array([[-1/self.Tq0p , 0,0,0],\
-                           [0 , -self.KG(self.a,self.b,self.n,self.Eqp[-1])/self.Td0p,0,0],\
-                           [(1/self.Tq0pp-1/self.Tq0p),0,-1/self.Tq0pp , 0],\
-                           [0 , (1/self.Td0pp-self.KG(self.a,self.b,self.n,self.Eqp[-1])/self.Td0p),0,-1/self.Td0pp ]
-                           ])
-<<<<<<< HEAD
-        self.B = np.array([0, 1 / self.Td0p, 0, 1 / self.Td0p])
+        self.E = np.array([self.Edp[-1], self.Eqp[-1], self.Edpp[-1],self.Eqpp[-1]]).reshape(-1, 1)  # [Edp,Eqp,Edpp,Eqpp]
+        self.pE = np.array([0, 0, 0, 0]).reshape(-1, 1)  # -1表示我懒得计算该填什么数字，由python通过原数组和其他的值3推测出来。
+        self.Y = np.array([0, 0]).reshape(-1, 1)  # ud,uq
+        self.A = np.array([ [-1 / self.Tq0p, 0, 0, 0],
+                            [0, -self.KG(self.a, self.b, self.n, self.Eqp[-1]) / self.Td0p, 0, 0],
+                            [(1 / self.Tq0pp - 1 / self.Tq0p), 0, -1 / self.Tq0pp, 0],
+                            [0, (1 / self.Td0pp - self.KG(self.a, self.b, self.n, self.Eqp[-1]) / self.Td0p), 0, -1 / self.Td0pp]
+                            ])
+        self.B = np.array([0, 1 / self.Td0p, 0, 1 / self.Td0p]).reshape(-1, 1)
+        self.C = np.array([0, 0, 1, 1]).reshape(-1, 1)
+        
+        
         print(self.A)
         print(self.B)
-=======
-        self.B = np.array([0, 1 / self.Td0p, 0, 1 / self.Td0p]).reshape(-1, 1)
-        self.C = np.array([1, 1]).reshape(-1, 1)
+        print(self.C)
+        print(self.E)
 
-    def  ParameterInitial(self):
-        self.Kp = 500
-        self.uref = self.Efd[-1]/self.Kp+np.sqrt(self.ud[-1]**2 + self.uq[-1]**2)
-        print(self.uref)
->>>>>>> f73bca7eaa453f9092d91d3c630116c93678b2c8
-
-    def PID(self, Kp , uref, ud, uq):
-            return Kp* (uref - np.sqrt(ud**2 + uq**2))
-
-        # print(self.A)
-        # print(self.B)
-        # print(self.C)
-        # print(self.E)
+    def PID(self, Kp, uref, ud, uq):
+        return Kp * (uref - np.sqrt(ud**2 + uq**2))
 
     def KG(self, a, b, n, Eqpp):
         return 1 + b / a * Eqpp**(n - 1)
@@ -106,12 +90,12 @@ class Model():
         return ynext
 
     def test_f(self, t, y):
-        #y=t^3-t^2+3
-        #y'=3t^2-2t
+        # y=t^3-t^2+3
+        # y'=3t^2-2t
         return 3 * t * t - 2 * t
 
-    def f(self,t ,E):
-        return self.A*self.E+self.B
+    def f(self, t, E):
+        return self.A * self.E + self.B
 
     def test_calculate(self):
         while self.t < 1:
@@ -124,6 +108,10 @@ class Model():
         plt.plot(self.tseq, self.yseq, '+-')
         plt.plot(self.tseq_original, self.yseq_original, '-')
         plt.show()
+
+    def Calculate(self):
+        pass
+        
 
 
 if __name__ == "__main__":

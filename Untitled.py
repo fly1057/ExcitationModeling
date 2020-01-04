@@ -36,8 +36,10 @@ class Model():
 
     def DefaultParametersetting(self):
         self.dt = 0.01
-        self.tseq = [0]
-        self.yseq = [3.0]
+        self.t = 0
+        self.y = 3.0
+        self.tseq = []
+        self.yseq = []
         self.tseq_original = np.arange(0, 1, 0.01)
         self.yseq_original = self.tseq_original**3 - self.tseq_original**2 + 3
         self.Tq0p = 0.9
@@ -61,6 +63,7 @@ class Model():
         self.E = np.array([self.Edp[-1], self.Eqp[-1], self.Edpp[-1],self.Eqpp[-1]]).reshape(-1, 1)  #[Edp,Eqp,Edpp,Eqpp]
         self.pE = np.array([0, 0, 0, 0]).reshape(-1, 1)  #-1表示我懒得计算该填什么数字，由python通过原数组和其他的值3推测出来。
         self.Y = np.array([0, 0]).reshape(-1, 1)  #ud,uq  
+
         self.A = np.array([[-1/self.Tq0p , 0,0,0],\
                            [0 , -self.KG(self.a,self.b,self.n,self.Eqp[-1])/self.Td0p,0,0],\
                            [(1/self.Tq0pp-1/self.Tq0p),0,-1/self.Tq0pp , 0],\
@@ -74,6 +77,10 @@ class Model():
         print(self.B)
         print(self.C)
         print(self.E)
+
+    def ParameterInitial(self):
+        pass
+
 
     def PID(self, Kp, uref, ud, uq):
         return Kp * (uref - np.sqrt(ud**2 + uq**2))
@@ -98,11 +105,9 @@ class Model():
         return self.A * self.E + self.B
 
     def test_calculate(self):
-        while self.t < 1:
-            self.tseq.append(self.t)
-            self.yseq.append(self.y)
-            self.y = self.rk4(self.y, self.test_f, self.dt, self.t)
-            self.t = self.t + self.dt
+        while self.dt < 1:
+            self.tseq.append(self.dt)
+            self.yseq.append( self.rk4(self.yseq[-1], self.test_f, self.dt, self.tseq[-1]) )
 
     def test_plot(self):
         plt.plot(self.tseq, self.yseq, '+-')

@@ -27,6 +27,9 @@ PE=A*E+B*D*C*E
 
 import numpy as np
 import matplotlib.pyplot as plt
+import pandas as pd
+plt.rcParams['font.sans-serif'] = ['SimHei']  # 步骤一（替换sans-serif字体）
+plt.rcParams['axes.unicode_minus'] = False   # 步骤二（解决坐标轴负数的负号显示问题）
 
 
 class Model():
@@ -36,59 +39,72 @@ class Model():
 
     def DefaultParametersetting(self):
         self.dt = 0.01
-        self.t = 0
+        self.t = 0.0
         self.y = 3.0
-        self.tseq = []
-        self.yseq = []
+        self.tseq = [0.0]
+        self.yseq = [3.0]
         self.tseq_original = np.arange(0, 1, 0.01)
         self.yseq_original = self.tseq_original**3 - self.tseq_original**2 + 3
-        self.Tq0p = 0.9
-        self.Td0p = 8
-        self.Tq0pp = 0.04
-        self.Td0pp = 0.06
-        self.a = 1
+
+
+        #控制参数
+        self.Tr = 0.02
+        self.K = 22*7.8
+        self.T1 = 1.0
+        self.T2 = 4.0
+        self.T3 = 1.0
+        self.T4 = 1.0
+        #发电机参数
+        self.Tq0p = 0.198
+        self.Td0p = 9.45
+        self.Tq0pp = 0.198
+        self.Td0pp = 0.091
+        self.a = 1.0
         self.b = 0.192
         self.n = 6.246
-        self.ud = [0]
-        self.uq = [0.95]
-        self.KG0 = self.KG(self.a, self.b, self.n, self.uq[0])
-        self.Efd = [self.uq[0] * self.KG0]
-        self.Kp = 500
-        self.Edp = [0]
-        self.Eqp = [self.uq[0]]
-        self.Edpp = [0]
-        self.Eqpp = [self.uq[0]]
-        self.uref = [self.ParameterInitial()]
+        #需求变量定义及初始化
+        self.ud0 = 0
+        self.uq0 = 0.95
+        self.Edp0 = 0
+        self.Eqp0 = 0.95
+        self.Edpp0 = 0
+        self.Eqpp0 = 0.95
+        self.KG0 = 1 + self.b / self.a * self.Eqpp0**(self.n - 1)
+        self.Efd0 = self.uq0 * self.KG0
+        self.uref0 = self.Efd0/self.K+self.uq0
+        self.deltaU = 0.049
+        self.Tstart = 1
+        self.Tend = 6
+        self.Efd10 = self.Efd0
+        self.Efd20 = self.Efd0
+        self.Efd30 = self.Efd0
+        
+        self.dtvector = np.array([0.001]*7).reshape(-1,1)
+        self.tvector = np.array([0]*7).reshape(-1,1)
+        self.tmatrix = np.array([0]*7).reshape(-1,1)
 
-        self.E = np.array([self.Edp[-1], self.Eqp[-1], self.Edpp[-1],self.Eqpp[-1]]).reshape(-1, 1)  #[Edp,Eqp,Edpp,Eqpp]
-        self.pE = np.array([0, 0, 0, 0]).reshape(-1, 1)  #-1表示我懒得计算该填什么数字，由python通过原数组和其他的值3推测出来。
-        self.Y = np.array([0, 0]).reshape(-1, 1)  #ud,uq  
+        self.Evector = np.array([self.Edp0, self.Eqp0, self.Edpp0,self.Eqpp0,self.Efd10,self.Efd20,self.Efd30]).reshape(-1, 1)  #[Edp,Eqp,Edpp,Eqpp]
+        self.Ematrix = self.Evector
 
-        self.A = np.array([[-1/self.Tq0p , 0,0,0],\
-                           [0 , -self.KG(self.a,self.b,self.n,self.Eqp[-1])/self.Td0p,0,0],\
-                           [(1/self.Tq0pp-1/self.Tq0p),0,-1/self.Tq0pp , 0],\
-                           [0 , (1/self.Td0pp-self.KG(self.a,self.b,self.n,self.Eqp[-1])/self.Td0p),0,-1/self.Td0pp ]
+        self.pEvector = np.array([0]*7).reshape(-1, 1)  #-1表示我懒得计算该填什么数字，由python通过原数组和其他的值3推测出来。
+        self.pEmatrix = self.pEvector
+
+        self.A = np.array([[-1/self.Tq0p , 0,0,0,0,0,0],\
+                           [0 , -(1 + self.b / self.a * float(self.Evector[3])**(self.n - 1))/self.Td0p,0,0,0,0,1/self.Td0p],\
+                           [(1/self.Tq0pp-1/self.Tq0p),0,-1/self.Tq0pp , 0,0,0,0],\
+                           [0 , (1/self.Td0pp-(1 + self.b / self.a * float(self.Evector[3])**(self.n - 1))/self.Td0p),0,-1/self.Td0pp,0,0,1/self.Td0p],\
+                           [0,0,0,0,-1/self.Tr ,0,0],\
+                           [0,0,0,0,1/self.T2-self.T1/(self.T2*self.Tr),-1/self.T2,0],\
+                           [0,0,0,0,self.T3/self.T4*(1/self.T2-self.T1/(self.T2*self.Tr)),(1/self.T4-self.T3/(self.T4*self.T2)),-1/self.T4]
                            ])
-        self.B = np.array([0, 1 / self.Td0p, 0, 1 / self.Td0p]).reshape(-1, 1)
-        self.C = np.array([0, 0, 1, 1]).reshape(-1, 1)
-        
-        
-        print(self.A)
-        print(self.B)
-        print(self.C)
-        print(self.E)
+        self.B = np.array([0,0,0,0, self.K/self.Tr,self.T1/self.T2*self.K/self.Tr,self.T1/self.T2*self.T3/self.T4*self.K/self.Tr]).reshape(-1, 1)
 
-    def ParameterInitial(self):
-        pass
-
-
-    def PID(self, Kp, uref, ud, uq):
-        return Kp * (uref - np.sqrt(ud**2 + uq**2))
-
-    def KG(self, a, b, n, Eqpp):
-        return 1 + b / a * Eqpp**(n - 1)
+        print("A = \n",self.A)
+        print("B = \n",self.B)
+        print("E = \n",self.Ematrix)
 
     def rk4(self, y, f, dt, t):
+
         k1 = f(t, y)
         k2 = f(t + dt / 2, y + dt / 2 * k1)
         k3 = f(t + dt / 2, y + dt / 2 * k2)
@@ -96,30 +112,66 @@ class Model():
         ynext = y + dt / 6.0 * (k1 + 2 * k2 + 2 * k3 + k4)
         return ynext
 
+    def uref_fun(self,t):
+
+        if t< self.Tstart :
+            temp = self.uref0
+        else :
+            temp = self.uref0 + self.deltaU
+        return temp
+
     def test_f(self, t, y):
         # y=t^3-t^2+3
         # y'=3t^2-2t
         return 3 * t * t - 2 * t
 
-    def f(self, t, E):
-        return self.A * self.E + self.B
+    def test_f2(self, t, Evector):
+
+        return self.A@Evector+self.B*(self.uref_fun(self.tvector[0])-float(np.sqrt(Evector[2]**2+Evector[3]**2)))
+
+    def test_calculate2(self):
+        try:
+            while self.tvector[0] < self.Tend:
+                self.Evector = self.rk4(self.Evector, self.test_f2, self.dtvector, self.tvector)
+                self.Ematrix = np.hstack((self.Ematrix,self.Evector))
+                self.tvector = self.tvector + self.dtvector
+                self.tmatrix = np.hstack((self.tmatrix , self.tvector))
+        except Exception as e:
+            print(e)
+            print(e.__traceback__.tb_frame.f_globals["__file__"])  # 发生异常所在的文件
+            print(e.__traceback__.tb_lineno)  # 发生异常所在的行数
 
     def test_calculate(self):
-        while self.dt < 1:
-            self.tseq.append(self.dt)
-            self.yseq.append( self.rk4(self.yseq[-1], self.test_f, self.dt, self.tseq[-1]) )
+        try:
+            while self.t < 1:
+                self.yseq.append( self.rk4(self.yseq[-1], self.test_f, self.dt, self.tseq[-1]) )
+                self.t = self.t + self.dt
+                self.tseq.append(self.t)
+        except Exception as e:
+            print(e)
+            print(e.__traceback__.tb_frame.f_globals["__file__"])  # 发生异常所在的文件
+            print(e.__traceback__.tb_lineno)  # 发生异常所在的行数
 
     def test_plot(self):
         plt.plot(self.tseq, self.yseq, '+-')
         plt.plot(self.tseq_original, self.yseq_original, '-')
         plt.show()
 
-    def Calculate(self):
-        pass
-        
+    def test_plot2(self):
+        plt.plot(self.tmatrix[1,:],self.Ematrix[1,:], '-')
+        plt.show()
 
 
 if __name__ == "__main__":
+    df = pd.read_csv('C:/Users/ll/Desktop/zaoshistep.csv')
+    meas_t = df["t"]
+    meas_ug = df["UAB2"]
     model = Model()
-    model.test_calculate()
-    model.test_plot()
+    model.test_calculate2()
+    # model.test_plot2()
+    plt.plot(meas_t,meas_ug)
+    plt.plot(model.tmatrix[1,:],model.Ematrix[1,:], '-')
+    plt.legend(["录波实测","python仿真"])
+    plt.grid()
+    plt.show()
+

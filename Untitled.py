@@ -171,7 +171,6 @@ if __name__ == "__main__":
     # model.test_plot2()
     plt.plot(meas_t,meas_ug)
     plt.plot(model.tmatrix[1,:],model.Ematrix[1,:], '-')
-    plt.legend(["录波实测","python仿真"])
+    plt.legend(["实测录波","python仿真"])
     plt.grid()
     plt.show()
-

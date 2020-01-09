@@ -46,18 +46,18 @@ class Model():
         self.tseq_original = np.arange(0, 1, 0.01)
         self.yseq_original = self.tseq_original**3 - self.tseq_original**2 + 3
 
-
         #控制参数
-        self.Tr = 0.02
-        self.K = 22*7.8
+        self.Tr = 0.01
+        self.TA = 0.01
+        self.K = 22*7.84
         self.T1 = 1.0
         self.T2 = 4.0
         self.T3 = 1.0
         self.T4 = 1.0
         #发电机参数
-        self.Tq0p = 0.198
+        self.Tq0p = 0.2
         self.Td0p = 9.45
-        self.Tq0pp = 0.198
+        self.Tq0pp = 0.198   #0.198
         self.Td0pp = 0.091
         self.a = 1.0
         self.b = 0.192
@@ -72,32 +72,34 @@ class Model():
         self.KG0 = 1 + self.b / self.a * self.Eqpp0**(self.n - 1)
         self.Efd0 = self.uq0 * self.KG0
         self.uref0 = self.Efd0/self.K+self.uq0
-        self.deltaU = 0.049
+        self.deltaU = 0.0488
         self.Tstart = 1
         self.Tend = 6
-        self.Efd10 = self.Efd0
+        self.Efd10 = self.uref0-self.uq0
         self.Efd20 = self.Efd0
         self.Efd30 = self.Efd0
+        self.Efd40 = self.Efd0
         
-        self.dtvector = np.array([0.001]*7).reshape(-1,1)
-        self.tvector = np.array([0]*7).reshape(-1,1)
-        self.tmatrix = np.array([0]*7).reshape(-1,1)
+        self.dtvector = np.array([0.001]*8).reshape(-1,1)
+        self.tvector = np.array([0]*8).reshape(-1,1)
+        self.tmatrix = np.array([0]*8).reshape(-1,1)
 
-        self.Evector = np.array([self.Edp0, self.Eqp0, self.Edpp0,self.Eqpp0,self.Efd10,self.Efd20,self.Efd30]).reshape(-1, 1)  #[Edp,Eqp,Edpp,Eqpp]
+        self.Evector = np.array([self.Edp0, self.Eqp0, self.Edpp0,self.Eqpp0,self.Efd10,self.Efd20,self.Efd30,self.Efd40]).reshape(-1, 1)  #[Edp,Eqp,Edpp,Eqpp]
         self.Ematrix = self.Evector
 
-        self.pEvector = np.array([0]*7).reshape(-1, 1)  #-1表示我懒得计算该填什么数字，由python通过原数组和其他的值3推测出来。
+        self.pEvector = np.array([0]*8).reshape(-1, 1)  #-1表示我懒得计算该填什么数字，由python通过原数组和其他的值3推测出来。
         self.pEmatrix = self.pEvector
 
-        self.A = np.array([[-1/self.Tq0p , 0,0,0,0,0,0],\
-                           [0 , -(1 + self.b / self.a * float(self.Evector[3])**(self.n - 1))/self.Td0p,0,0,0,0,1/self.Td0p],\
-                           [(1/self.Tq0pp-1/self.Tq0p),0,-1/self.Tq0pp , 0,0,0,0],\
-                           [0 , (1/self.Td0pp-(1 + self.b / self.a * float(self.Evector[3])**(self.n - 1))/self.Td0p),0,-1/self.Td0pp,0,0,1/self.Td0p],\
-                           [0,0,0,0,-1/self.Tr ,0,0],\
-                           [0,0,0,0,1/self.T2-self.T1/(self.T2*self.Tr),-1/self.T2,0],\
-                           [0,0,0,0,self.T3/self.T4*(1/self.T2-self.T1/(self.T2*self.Tr)),(1/self.T4-self.T3/(self.T4*self.T2)),-1/self.T4]
+        self.A = np.array([[-1/self.Tq0p , 0,0,0,0,0,0,0],\
+                           [0 , -(1 + self.b / self.a * float(self.Evector[3])**(self.n - 1))/self.Td0p,0,0,0,0,0,1/self.Td0p],\
+                           [(1/self.Tq0pp-1/self.Tq0p),0,-1/self.Tq0pp ,0, 0,0,0,0],\
+                           [0 , (1/self.Td0pp-(1 + self.b / self.a * float(self.Evector[3])**(self.n - 1))/self.Td0p),0,-1/self.Td0pp,0,0,0,1/self.Td0p],\
+                           [0,0,0,0,-1/self.Tr,0 ,0,0],\
+                           [0,0,0,0,self.K/self.TA,-1/self.TA ,0,0],\
+                           [0,0,0,0,self.T1/self.T2*self.K/self.TA,1/self.T2-self.T1/(self.T2*self.TA),-1/self.T2,0],\
+                           [0,0,0,0,self.T1/self.T2*self.T3/self.T4*self.K/self.TA ,self.T3/self.T4*(1/self.T2-self.T1/(self.T2*self.TA)),(1/self.T4-self.T3/(self.T4*self.T2)),-1/self.T4]
                            ])
-        self.B = np.array([0,0,0,0, self.K/self.Tr,self.T1/self.T2*self.K/self.Tr,self.T1/self.T2*self.T3/self.T4*self.K/self.Tr]).reshape(-1, 1)
+        self.B = np.array([0,0,0,0,1,0,0,0]).reshape(-1, 1)
 
         print("A = \n",self.A)
         print("B = \n",self.B)
@@ -116,8 +118,20 @@ class Model():
 
         if t< self.Tstart :
             temp = self.uref0
-        else :
+        elif t<self.Tstart+0.02:
+            temp = self.uref0 + self.deltaU*(t-self.Tstart)/0.02
+        else :#这边瞬间上升有点问题
             temp = self.uref0 + self.deltaU
+        return temp
+
+    def duref_fun(self,t):
+        
+        if t< self.Tstart :
+            temp = 0
+        elif t<self.Tstart+0.02:
+            temp = self.deltaU/0.02
+        else :#这边瞬间上升有点问题
+            temp = 0
         return temp
 
     def test_f(self, t, y):
@@ -127,7 +141,7 @@ class Model():
 
     def test_f2(self, t, Evector):
 
-        return self.A@Evector+self.B*(self.uref_fun(self.tvector[0])-float(np.sqrt(Evector[2]**2+Evector[3]**2)))
+        return self.A@Evector+self.B*((self.uref_fun(self.tvector[0])-float(np.sqrt(Evector[2]**2+Evector[3]**2)))/self.Tr+self.duref_fun(self.tvector[0]) )
 
     def test_calculate2(self):
         try:
@@ -164,13 +178,21 @@ class Model():
 
 if __name__ == "__main__":
     df = pd.read_csv('C:/Users/ll/Desktop/zaoshistep.csv')
+    df2=pd.DataFrame
     meas_t = df["t"]
     meas_ug = df["UAB2"]
     model = Model()
     model.test_calculate2()
     # model.test_plot2()
+    #计算后仿真结果保存csv
+    temp = np.vstack((model.tmatrix[1,:],model.Ematrix))
+    df2=pd.DataFrame(temp.transpose(),columns=['t','Edp','Eqp','Edpp','Eqpp','Efd1','Efd2','Efd3','Efd4'])
+    df2.to_csv('C:/Users/ll/Desktop/zaoshistepsimulate考虑Tr.csv',index=0)
+
+    #绘图
     plt.plot(meas_t,meas_ug)
     plt.plot(model.tmatrix[1,:],model.Ematrix[1,:], '-')
     plt.legend(["实测录波","python仿真"])
     plt.grid()
     plt.show()
+    print(model.Ematrix)

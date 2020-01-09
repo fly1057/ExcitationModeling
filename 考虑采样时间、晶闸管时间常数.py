@@ -1,27 +1,16 @@
 '''
 1 方程组的矩阵形式
 PE=A*E+B*U   (1-1)
-Y=C*E        (1-2)
-U=D*Y        (1-3)
 
 2 步骤：
 2.1 首先定义并且进行初始化
-E = [ Edp , Eqp , Edpp ,Eqpp]
-U = Efd
-Y = [ud , uq ]
-A、B是可求的，C是确定的，但是D中有两个不定参数K和uref。先给出Y根据（1-2）可求E，根据（1-1）可求U，根据U、Y可求D。
-(1)给出Y
-(2)求出E = inv(C)*Y
-(3)求出U = invoice(B)*A*E
-(4)假设D=PID(K,uref,ud,uq),设定K，则可求出uref
+E = [ Edp , Eqp , Edpp ,Eqpp , Efd1 ,Efd2 ,Efd3 ,Efd4]
+ Efd1 ,Efd2 ,Efd3 ,Efd4为由于励磁PID导致的状态变量
+
 
 2.2 计算流程
-(1)对E,U,Y初始化
-(2)对式（1-1）调用龙格库塔计算E，调用（1-2）计算Y，调用（1-3）更新控制量U
-(3)使用龙格库塔法的前提是必须将所有变量均表示成为E的函数。
-因此可表示成为
-PE=A*E+B*D*C*E
-只有这种形式才能调用龙格库塔法，相当于只有一个变量E
+(1)对E,U初始化
+(2)对式（1-1）调用龙格库塔计算E，所有的变量都是E或者E中的量，这样才能进行龙格库塔计算，因为只有E一个变量
 
 '''
 
@@ -177,16 +166,21 @@ class Model():
 
 
 if __name__ == "__main__":
+    #读取实测采样波形
     df = pd.read_csv('C:/Users/ll/Desktop/zaoshistep.csv')
+    #构造仿真数据储存格式
     df2=pd.DataFrame
     meas_t = df["t"]
     meas_ug = df["UAB2"]
+
     model = Model()
     model.test_calculate2()
     # model.test_plot2()
     #计算后仿真结果保存csv
-    temp = np.vstack((model.tmatrix[1,:],model.Ematrix))
+    temp = np.vstack((model.tmatrix[1,:],model.Ematrix))#列向量横向拼凑
+    #重新构造dataframe的列名
     df2=pd.DataFrame(temp.transpose(),columns=['t','Edp','Eqp','Edpp','Eqpp','Efd1','Efd2','Efd3','Efd4'])
+    #dataframe保存时将索引去掉
     df2.to_csv('C:/Users/ll/Desktop/zaoshistepsimulate考虑Tr.csv',index=0)
 
     #绘图
@@ -195,4 +189,3 @@ if __name__ == "__main__":
     plt.legend(["实测录波","python仿真"])
     plt.grid()
     plt.show()
-    print(model.Ematrix)

@@ -5,7 +5,7 @@ PE=A*E+B*U   (1-1)
 2 步骤：
 2.1 首先定义并且进行初始化
 E = [ Edp , Eqp , Edpp ,Eqpp , Efd1 ,Efd2 ,Efd3 ,Efd4]
- Efd1 ,Efd2 ,Efd3 ,Efd4为由于励磁PID导致的状态变量
+Efd1 ,Efd2 ,Efd3 ,Efd4为由于励磁PID导致的状态变量
 
 
 2.2 计算流程
@@ -34,42 +34,60 @@ class Model():
         self.yseq = [3.0]
         self.tseq_original = np.arange(0, 1, 0.01)
         self.yseq_original = self.tseq_original**3 - self.tseq_original**2 + 3
-
-        #控制参数
-        self.Tr = 0.01
+########################################################################################
+        # #控制参数  皂市1数据
+        # self.Tr = 0.01
+        # self.TA = 0.01
+        # self.K = 22*7.84
+        # self.T1 = 1.0
+        # self.T2 = 4.0
+        # self.T3 = 1.0
+        # self.T4 = 1.0
+        # #发电机参数 皂市1数据
+        # self.Tq0p = 0.2
+        # self.Td0p = 9.45
+        # self.Tq0pp = 0.198   #0.198
+        # self.Td0pp = 0.091
+        # self.a = 1.0
+        # self.b = 0.192
+        # self.n = 6.246
+        #控制参数  湘潭3数据
+        self.Tr = 0.02
         self.TA = 0.01
-        self.K = 22*7.84
+        self.K = 500
         self.T1 = 1.0
-        self.T2 = 4.0
+        self.T2 = 8.33
         self.T3 = 1.0
         self.T4 = 1.0
-        #发电机参数
-        self.Tq0p = 0.2
-        self.Td0p = 9.45
-        self.Tq0pp = 0.198   #0.198
-        self.Td0pp = 0.091
+        #发电机参数 湘潭3数据
+        self.Tq0p = 0.95
+        self.Td0p = 9.32
+        self.Tq0pp = 0.069   
+        self.Td0pp = 0.045
         self.a = 1.0
-        self.b = 0.192
-        self.n = 6.246
+        self.b = 0.186
+        self.n = 8.357
+#########################################################################################
         #需求变量定义及初始化
         self.ud0 = 0
-        self.uq0 = 0.95
+        self.uq0 = 0.9493
         self.Edp0 = 0
-        self.Eqp0 = 0.95
+        self.Eqp0 = self.uq0
         self.Edpp0 = 0
-        self.Eqpp0 = 0.95
+        self.Eqpp0 = self.uq0
         self.KG0 = 1 + self.b / self.a * self.Eqpp0**(self.n - 1)
         self.Efd0 = self.uq0 * self.KG0
-        self.uref0 = self.Efd0/self.K+self.uq0
-        self.deltaU = 0.0488
+        self.uref0 = self.Efd0/(self.K*self.uq0)+self.uq0  #关键
+        self.deltaU = 0.05
         self.Tstart = 1
-        self.Tend = 6
+        self.Tend = 8
+        self.Tstepdelay = 0.01  #不可为0，否则将除以0
         self.Efd10 = self.uref0-self.uq0
         self.Efd20 = self.Efd0
         self.Efd30 = self.Efd0
         self.Efd40 = self.Efd0
         
-        self.dtvector = np.array([0.001]*8).reshape(-1,1)
+        self.dtvector = np.array([0.01]*8).reshape(-1,1)
         self.tvector = np.array([0]*8).reshape(-1,1)
         self.tmatrix = np.array([0]*8).reshape(-1,1)
 
@@ -107,8 +125,8 @@ class Model():
 
         if t< self.Tstart :
             temp = self.uref0
-        elif t<self.Tstart+0.02:
-            temp = self.uref0 + self.deltaU*(t-self.Tstart)/0.02
+        elif t<self.Tstart+self.Tstepdelay:
+            temp = self.uref0 + self.deltaU*(t-self.Tstart)/self.Tstepdelay
         else :#这边瞬间上升有点问题
             temp = self.uref0 + self.deltaU
         return temp
@@ -117,8 +135,8 @@ class Model():
         
         if t< self.Tstart :
             temp = 0
-        elif t<self.Tstart+0.02:
-            temp = self.deltaU/0.02
+        elif t<self.Tstart+self.Tstepdelay:
+            temp = self.deltaU/self.Tstepdelay
         else :#这边瞬间上升有点问题
             temp = 0
         return temp
@@ -129,8 +147,23 @@ class Model():
         return 3 * t * t - 2 * t
 
     def test_f2(self, t, Evector):
-
-        return self.A@Evector+self.B*((self.uref_fun(self.tvector[0])-float(np.sqrt(Evector[2]**2+Evector[3]**2)))/self.Tr+self.duref_fun(self.tvector[0]) )
+        Edp = self.Evector[0]
+        Eqp = self.Evector[1]
+        Edpp = self.Evector[2]
+        Eqpp = self.Evector[3]
+        Efd = self.Evector[7]
+        ug = float(np.sqrt(Edpp**2+Eqpp**2))
+        uref = self.uref_fun(self.tvector[0])
+        duref = self.duref_fun(self.tvector[0])
+        
+        temp = (uref*ug-ug**2)/self.Tr
+        + ug*duref + \
+            uref/ug*( \
+            (1/self.Tq0pp - 1/self.Tq0p)*Edp - \
+            1/self.Tq0p*Edpp + \
+            (1/self.Td0pp -  (1 + self.b / self.a * float(Eqpp)**(self.n - 1)))/self.Td0p*Eqp- \
+            1/self.Td0pp*Eqpp+1/self.Td0p*Efd)
+        return self.A@Evector+self.B*(temp)
 
     def test_calculate2(self):
         try:
@@ -167,11 +200,11 @@ class Model():
 
 if __name__ == "__main__":
     #读取实测采样波形
-    df = pd.read_csv('C:/Users/ll/Desktop/zaoshistep.csv')
+    df = pd.read_csv('C:/Users/ll/Desktop/xiangtan3.csv')
     #构造仿真数据储存格式
     df2=pd.DataFrame
     meas_t = df["t"]
-    meas_ug = df["UAB2"]
+    meas_ug = df["UAB"]
 
     model = Model()
     model.test_calculate2()
@@ -181,11 +214,12 @@ if __name__ == "__main__":
     #重新构造dataframe的列名
     df2=pd.DataFrame(temp.transpose(),columns=['t','Edp','Eqp','Edpp','Eqpp','Efd1','Efd2','Efd3','Efd4'])
     #dataframe保存时将索引去掉
-    df2.to_csv('C:/Users/ll/Desktop/zaoshistepsimulate考虑Tr.csv',index=0)
+    df2.to_csv('C:/Users/ll/Desktop/zaoshistepsimulate考虑TrTA ABB方式.csv',index=0)
 
     #绘图
     plt.plot(meas_t,meas_ug)
     plt.plot(model.tmatrix[1,:],model.Ematrix[1,:], '-')
     plt.legend(["实测录波","python仿真"])
+    plt.title("ABB控制方式")
     plt.grid()
     plt.show()

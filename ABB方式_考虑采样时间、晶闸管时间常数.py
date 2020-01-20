@@ -81,7 +81,7 @@ class Model():
         self.deltaU = 0.05
         self.Tstart = 1
         self.Tend = 8
-        self.Tstepdelay = 0.01  #不可为0，否则将除以0
+        self.Tstepdelay = 0.0001  #不可为0，否则将除以0
         self.Efd10 = self.uref0-self.uq0
         self.Efd20 = self.Efd0
         self.Efd30 = self.Efd0
@@ -200,7 +200,7 @@ class Model():
 
 if __name__ == "__main__":
     #读取实测采样波形
-    df = pd.read_csv('C:/Users/ll/Desktop/xiangtan3.csv')
+    df = pd.read_csv('H:/L330backup/file/work_index/generalfile/github/ExcitationModeling/xiangtan3step.csv')
     #构造仿真数据储存格式
     df2=pd.DataFrame
     meas_t = df["t"]

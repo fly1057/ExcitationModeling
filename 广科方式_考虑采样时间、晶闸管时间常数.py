@@ -15,6 +15,7 @@ E = [ Edp , Eqp , Edpp ,Eqpp , Efd1 ,Efd2 ,Efd3 ,Efd4]
 励磁系统的定标，那么也就是说厂家用什么定标实际上对仿真没有影响。仿真实际上做的是仿真的框架。
 '''
 
+import os 
 import numpy as np
 import matplotlib.pyplot as plt
 import pandas as pd
@@ -36,42 +37,42 @@ class Model():
         self.tseq_original = np.arange(0, 1, 0.01)
         self.yseq_original = self.tseq_original**3 - self.tseq_original**2 + 3
 ########################################################################################
-        # #控制参数  皂市1数据
-        # self.Tr = 0.01
-        # self.TA = 0.01
-        # self.K = 22*7.84
-        # self.T1 = 1.0
-        # self.T2 = 4.0
-        # self.T3 = 1.0
-        # self.T4 = 1.0
-        # #发电机参数 皂市1数据
-        # self.Tq0p = 0.2
-        # self.Td0p = 9.45
-        # self.Tq0pp = 0.198   #0.198
-        # self.Td0pp = 0.091
-        # self.a = 1.0
-        # self.b = 0.192
-        # self.n = 6.246
-        #控制参数 湘潭3数据
-        self.Tr = 0.02
+        #控制参数  皂市1数据
+        self.Tr = 0.01
         self.TA = 0.01
-        self.K = 500
+        self.K = 22*7.84
         self.T1 = 1.0
-        self.T2 = 8.33
+        self.T2 = 4.0
         self.T3 = 1.0
         self.T4 = 1.0
-        #发电机参数 湘潭3数据
-        self.Tq0p = 0.95
-        self.Td0p = 9.32
-        self.Tq0pp = 0.069   
-        self.Td0pp = 0.045
+        #发电机参数 皂市1数据
+        self.Tq0p = 0.2
+        self.Td0p = 9.45
+        self.Tq0pp = 0.198   #0.198
+        self.Td0pp = 0.091
         self.a = 1.0
-        self.b = 0.186
-        self.n = 8.357
+        self.b = 0.192
+        self.n = 6.246
+        # #控制参数 湘潭3数据
+        # self.Tr = 0.02
+        # self.TA = 0.01
+        # self.K = 500
+        # self.T1 = 1.0
+        # self.T2 = 8.33
+        # self.T3 = 1.0
+        # self.T4 = 1.0
+        # #发电机参数 湘潭3数据
+        # self.Tq0p = 0.95
+        # self.Td0p = 9.32
+        # self.Tq0pp = 0.069   
+        # self.Td0pp = 0.045
+        # self.a = 1.0
+        # self.b = 0.186
+        # self.n = 8.357
 #########################################################################################
         #需求变量定义及初始化
         self.ud0 = 0
-        self.uq0 = 0.9493
+        self.uq0 = 0.95
         self.Edp0 = 0
         self.Eqp0 = self.uq0
         self.Edpp0 = 0
@@ -79,7 +80,7 @@ class Model():
         self.KG0 = 1 + self.b / self.a * self.Eqpp0**(self.n - 1)
         self.Efd0 = self.uq0 * self.KG0
         self.uref0 = self.Efd0/self.K+self.uq0  #关键
-        self.deltaU = 0.05
+        self.deltaU = 0.0485
         self.Tstart = 1
         self.Tend = 8
         self.Tstepdelay = 0.03  #不可为0，否则将除以0 
@@ -186,12 +187,12 @@ class Model():
 
 if __name__ == "__main__":
     #读取实测采样波形
-    df = pd.read_csv('C:/Users/ll/Desktop/zaoshistep.csv')
-    df = pd.read_csv('C:/Users/ll/Desktop/xiangtan3.csv')
+    df = pd.read_csv("H:/L330backup/file/work_index/generalfile/github/ExcitationModeling/zaoshi1step.csv")
+    #df = pd.read_csv('C:/Users/ll/Desktop/xiangtan3.csv')
     #构造仿真数据储存格式
     df2=pd.DataFrame
     meas_t = df["t"]
-    meas_ug = df["UAB"]
+    meas_ug = df["UAB2"]
 
     model = Model()
     model.test_calculate2()

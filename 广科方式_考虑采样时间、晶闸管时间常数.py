@@ -182,7 +182,7 @@ class Model():
     def test_plot2(self):
         plt.plot(self.tmatrix[1,:],self.Ematrix[1,:], '-')
         plt.show()
-
+        
 
 if __name__ == "__main__":
     #读取实测采样波形

@@ -13,7 +13,7 @@ Efd1 ,Efd2 ,Efd3 ,Efd4为由于励磁PID导致的状态变量
 (2)对式（1-1）调用龙格库塔计算E，所有的变量都是E或者E中的量，这样才能进行龙格库塔计算，因为只有E一个变量
 
 '''
-
+import  os
 import numpy as np
 import matplotlib.pyplot as plt
 import pandas as pd
@@ -200,7 +200,7 @@ class Model():
 
 if __name__ == "__main__":
     #读取实测采样波形
-    df = pd.read_csv('H:/L330backup/file/work_index/generalfile/github/ExcitationModeling/xiangtan3step.csv')
+    df = pd.read_csv((os.getcwd()).replace("\\","/")+'/xiangtan3step.csv')
     #构造仿真数据储存格式
     df2=pd.DataFrame
     meas_t = df["t"]
@@ -214,7 +214,7 @@ if __name__ == "__main__":
     #重新构造dataframe的列名
     df2=pd.DataFrame(temp.transpose(),columns=['t','Edp','Eqp','Edpp','Eqpp','Efd1','Efd2','Efd3','Efd4'])
     #dataframe保存时将索引去掉
-    df2.to_csv('C:/Users/ll/Desktop/zaoshistepsimulate考虑TrTA ABB方式.csv',index=0)
+    df2.to_csv((os.getcwd()).replace("\\","/")+'/xiangtan3stepsimulate考虑TrTA ABB方式.csv',index=0)
 
     #绘图
     plt.plot(meas_t,meas_ug, linewidth = '1', label = "test1", linestyle='-', marker='')

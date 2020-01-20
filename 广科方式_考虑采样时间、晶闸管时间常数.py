@@ -187,7 +187,7 @@ class Model():
 
 if __name__ == "__main__":
     #读取实测采样波形
-    df = pd.read_csv("H:/L330backup/file/work_index/generalfile/github/ExcitationModeling/zaoshi1step.csv")
+    df = pd.read_csv((os.getcwd()).replace("\\","/")+'/zaoshi1step.csv')
     #df = pd.read_csv('C:/Users/ll/Desktop/xiangtan3.csv')
     #构造仿真数据储存格式
     df2=pd.DataFrame
@@ -202,7 +202,7 @@ if __name__ == "__main__":
     #重新构造dataframe的列名
     df2=pd.DataFrame(temp.transpose(),columns=['t','Edp','Eqp','Edpp','Eqpp','Efd1','Efd2','Efd3','Efd4'])
     #dataframe保存时将索引去掉
-    df2.to_csv('C:/Users/ll/Desktop/zaoshistepsimulate考虑TrTA 广科方式.csv',index=0)
+    df2.to_csv((os.getcwd()).replace("\\","/")+'/zaoshistepsimulate考虑TrTA 广科方式.csv',index=0)
 
     #绘图
     plt.plot(meas_t,meas_ug, linewidth = '1', label = "test1", linestyle='-', marker='')

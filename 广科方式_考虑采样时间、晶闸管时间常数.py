@@ -127,7 +127,7 @@ class Model():
             temp = self.uref0
         elif t<self.Tstart+self.Tstepdelay:
             temp = self.uref0 + self.deltaU*(t-self.Tstart)/self.Tstepdelay
-        else :#这边瞬间上升有点问题
+        else :
             temp = self.uref0 + self.deltaU
         return temp
 
@@ -137,7 +137,7 @@ class Model():
             temp = 0
         elif t<self.Tstart+self.Tstepdelay:
             temp = self.deltaU/self.Tstepdelay
-        else :#这边瞬间上升有点问题
+        else :
             temp = 0
         return temp
 
@@ -203,8 +203,9 @@ if __name__ == "__main__":
     df2.to_csv('C:/Users/ll/Desktop/zaoshistepsimulate考虑TrTA 广科方式.csv',index=0)
 
     #绘图
-    plt.plot(meas_t,meas_ug)
-    plt.plot(model.tmatrix[1,:],model.Ematrix[3,:], '-')
+    plt.plot(meas_t,meas_ug, linewidth = '1', label = "test1", linestyle='-', marker='')
+    plt.plot(model.tmatrix[1,:],model.Ematrix[3,:], linewidth = '3', label = "test2",  linestyle='--')
+    plt.legend(["实测录波","python仿真"])
     plt.legend(["广科实测录波","python仿真"])
     plt.title("广科控制方式")
     plt.grid()

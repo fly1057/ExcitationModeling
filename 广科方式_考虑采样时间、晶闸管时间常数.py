@@ -83,7 +83,7 @@ class Model():
         self.deltaU = 0.0485
         self.Tstart = 1
         self.Tend = 8
-        self.Tstepdelay = 0.03  #不可为0，否则将除以0 
+        self.Tstepdelay = 0.01  #不可为0，否则将除以0 
         self.Efd10 = self.uref0-self.uq0
         self.Efd20 = self.Efd0
         self.Efd30 = self.Efd0

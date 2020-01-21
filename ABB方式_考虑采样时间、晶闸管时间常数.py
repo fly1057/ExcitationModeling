@@ -81,12 +81,13 @@ class Model():
         self.deltaU = 0.05
         self.Tstart = 1
         self.Tend = 8
-        self.Tstepdelay = 0.0001  #不可为0，否则将除以0
+        self.Tstepdelay = 0.001 #不可为0，否则将除以0
         self.Efd10 = self.uref0-self.uq0
         self.Efd20 = self.Efd0
         self.Efd30 = self.Efd0
         self.Efd40 = self.Efd0
         
+        #快速形成列向量的方法
         self.dtvector = np.array([0.01]*8).reshape(-1,1)
         self.tvector = np.array([0]*8).reshape(-1,1)
         self.tmatrix = np.array([0]*8).reshape(-1,1)
@@ -121,6 +122,7 @@ class Model():
         ynext = y + dt / 6.0 * (k1 + 2 * k2 + 2 * k3 + k4)
         return ynext
 
+    #uref的定义和duref的定义也很有意思
     def uref_fun(self,t):
 
         if t< self.Tstart :
@@ -146,7 +148,7 @@ class Model():
         # y'=3t^2-2t
         return 3 * t * t - 2 * t
 
-    def test_f2(self, t, Evector):
+    def test_f2(self, t, Evector):#即为rk4中需要的导数函数
         Edp = self.Evector[0]
         Eqp = self.Evector[1]
         Edpp = self.Evector[2]
@@ -165,9 +167,10 @@ class Model():
             1/self.Td0pp*Eqpp+1/self.Td0p*Efd)
         return self.A@Evector+self.B*(temp)
 
-    def test_calculate2(self):
+    def test_calculate2(self):#实现利用rk4进行计算，然后更新各向量或者矩阵
         try:
             while self.tvector[0] < self.Tend:
+            #rk4的格式为rk4( y, f, dt, t)
                 self.Evector = self.rk4(self.Evector, self.test_f2, self.dtvector, self.tvector)
                 self.Ematrix = np.hstack((self.Ematrix,self.Evector))
                 self.tvector = self.tvector + self.dtvector
@@ -200,6 +203,7 @@ class Model():
 
 if __name__ == "__main__":
     #读取实测采样波形
+    #这里采用了系统还是来得到当前文件的路径，从中将默认的分隔符进行了替换
     df = pd.read_csv((os.getcwd()).replace("\\","/")+'/xiangtan3step.csv')
     #构造仿真数据储存格式
     df2=pd.DataFrame
@@ -210,6 +214,7 @@ if __name__ == "__main__":
     model.test_calculate2()
     # model.test_plot2()
     #计算后仿真结果保存csv
+    #这里利用了vstack这个函数，很方便的进行列矩阵的构造
     temp = np.vstack((model.tmatrix[1,:],model.Ematrix))#列向量横向拼凑
     #重新构造dataframe的列名
     df2=pd.DataFrame(temp.transpose(),columns=['t','Edp','Eqp','Edpp','Eqpp','Efd1','Efd2','Efd3','Efd4'])

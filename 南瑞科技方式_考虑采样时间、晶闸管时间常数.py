@@ -1,9 +1,9 @@
 '''
 1 方程组的矩阵形式
-PE=A*E+B*U   (1-1)
+PE=A*E+B*U   (1-1)   
 
 2 步骤：
-2.1 首先定义并且进行初始化
+2.1 首先定义并且进行初始化  
 E = [ Edp , Eqp , Edpp ,Eqpp , Efd1 ,Efd2 ,Efd3 ,Efd4]
  Efd1 ,Efd2 ,Efd3 ,Efd4为由于励磁PID导致的状态变量  
 
@@ -52,7 +52,7 @@ class Model():
         self.Td0pp = 0.091
         self.a = 1.0
         self.b = 0.192
-        self.n = 6.246
+        self.n = 6.2460
         # #控制参数 湘潭3数据
         # self.Tr = 0.02
         # self.TA = 0.01

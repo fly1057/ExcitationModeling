@@ -5,7 +5,7 @@ PE=A*E+B*U   (1-1)
 2 步骤：
 2.1 首先定义并且进行初始化
 E = [ Edp , Eqp , Edpp ,Eqpp , Efd1 ,Efd2 ,Efd3 ,Efd4]
- Efd1 ,Efd2 ,Efd3 ,Efd4为由于励磁PID导致的状态变量
+ Efd1 ,Efd2 ,Efd3 ,Efd4为由于励磁PID导致的状态变量  
 
 
 2.2 计算流程

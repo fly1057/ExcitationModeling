@@ -224,7 +224,7 @@ if __name__ == "__main__":
     #绘图
     plt.plot(meas_t,meas_ug, linewidth = '1', label = "test1", linestyle='-', marker='')
     plt.plot(model.tmatrix[1,:],model.Ematrix[1,:], linewidth = '3', label = "test2",  linestyle='--')
-    plt.legend(["实测录波","python仿真"])
-    plt.title("ABB控制方式")
+    plt.legend(["Measurement","python  Simulation"])
+    plt.title("ABB  device")
     plt.grid()
     plt.show()

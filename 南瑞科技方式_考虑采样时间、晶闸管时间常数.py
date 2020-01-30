@@ -183,8 +183,7 @@ class Model():
 
     def test_plot2(self):
         plt.plot(self.tmatrix[1,:],self.Ematrix[1,:], '-')
-        plt.show()
-        
+        plt.show()     
 
 if __name__ == "__main__":
     #读取实测采样波形
@@ -212,4 +211,3 @@ if __name__ == "__main__":
     plt.title("NES5100 device")
     plt.grid()
     plt.show()
-    

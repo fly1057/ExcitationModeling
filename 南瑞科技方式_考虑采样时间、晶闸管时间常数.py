@@ -11,7 +11,7 @@ E = [ Edp , Eqp , Edpp ,Eqpp , Efd1 ,Efd2 ,Efd3 ,Efd4]
 2.2 计算流程
 (1)对E,U初始化
 (2)对式（1-1）调用龙格库塔计算E，所有的变量都是E或者E中的量，这样才能进行龙格库塔计算，因为只有E一个变量
-(3)南瑞科技的控制模型里面cos=K(uref-ug)/ug  里面的量并未涉及励磁系统的定标，串联传递函数也未涉及
+(3)南瑞科技的控制模型里面仍然使用cos=K(uref-ug)/ug  里面的量并未涉及励磁系统的定标，串联传递函数也未涉及
 励磁系统的定标，那么也就是说厂家用什么定标实际上对仿真没有影响。仿真实际上做的是仿真的框架。
 '''
 
@@ -99,6 +99,7 @@ class Model():
         self.pEvector = np.array([0]*8).reshape(-1, 1)  #-1表示我懒得计算该填什么数字，由python通过原数组和其他的值3推测出来。
         self.pEmatrix = self.pEvector
 
+        #只需要改变A阵即可
         self.A = np.array([[-1/self.Tq0p , 0,0,0,0,0,0,0],\
                            [0 , -(1 + self.b / self.a * float(self.Evector[3])**(self.n - 1))/self.Td0p,0,0,0,0,0,1/self.Td0p],\
                            [(1/self.Tq0pp-1/self.Tq0p),0,-1/self.Tq0pp ,0, 0,0,0,0],\

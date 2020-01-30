@@ -212,3 +212,4 @@ if __name__ == "__main__":
     plt.title("NES5100 device")
     plt.grid()
     plt.show()
+    

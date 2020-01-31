@@ -40,7 +40,7 @@ class Model():
         #控制参数  五强溪3数据
         self.Tr = 0.02
         self.TA = 0.01
-        self.K = 1
+        self.K = 1.1
         self.Kv = 0
         self.Kp = 60
         self.Ki = 20
@@ -53,8 +53,8 @@ class Model():
         self.x1 = (-self.bx + np.sqrt((self.bx)**2-4*self.ax*self.cx))/(2*self.ax)
         self.x2 = (-self.bx - np.sqrt((self.bx)**2-4*self.ax*self.cx))/(2*self.ax)
         self.T1 = -1/self.x1
-        self.T2 = -1/self.x2
-        self.T3 = 1/self.Ki
+        self.T2 = 1/self.Ki
+        self.T3 = -1/self.x2
         self.T4 = self.Td
 
         #发电机参数 五强溪3数据

@@ -212,6 +212,4 @@ if __name__ == "__main__":
     plt.grid()
     plt.show()
 
-    
-
 

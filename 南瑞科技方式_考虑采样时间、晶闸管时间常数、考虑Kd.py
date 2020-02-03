@@ -40,7 +40,7 @@ class Model():
         #控制参数  五强溪3数据
         self.Tr = 0.02
         self.TA = 0.01
-        self.K = 1.1
+        self.K = 1.0
         self.Kv = 0
         self.Kp = 60
         self.Ki = 20
@@ -93,10 +93,10 @@ class Model():
         self.KG0 = 1 + self.b / self.a * self.Eqpp0**(self.n - 1)
         self.Efd0 = self.uq0 * self.KG0
         self.uref0 = self.uq0  #关键
-        self.deltaU = 0.05
+        self.deltaU = 0.0495
         self.Tstart = 1
         self.Tend = 8
-        self.Tstepdelay = 0.01  #不可为0，否则将除以0 
+        self.Tstepdelay = 0.02 #不可为0，否则将除以0 
         self.Efd10 = 0 #关键
         self.Efd20 = 0 #关键
         self.Efd30 = self.Efd0 #关键

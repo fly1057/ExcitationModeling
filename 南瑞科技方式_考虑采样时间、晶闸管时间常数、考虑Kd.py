@@ -40,11 +40,11 @@ class Model():
         #控制参数  五强溪3数据
         self.Tr = 0.02
         self.TA = 0.01
-        self.K = 1.0
+        self.K = 1
         self.Kv = 0
         self.Kp = 60
         self.Ki = 20
-        self.Kd = 1
+        self.Kd = 0
         self.Td = 0.01
         #将并联PID转化为串联PID
         self.ax = (self.Kp*self.Td + self.Kd )/self.Ki
@@ -85,7 +85,7 @@ class Model():
 #########################################################################################
         #需求变量定义及初始化
         self.ud0 = 0
-        self.uq0 = 0.95
+        self.uq0 = 0.94765
         self.Edp0 = 0
         self.Eqp0 = self.uq0
         self.Edpp0 = 0
@@ -93,7 +93,7 @@ class Model():
         self.KG0 = 1 + self.b / self.a * self.Eqpp0**(self.n - 1)
         self.Efd0 = self.uq0 * self.KG0
         self.uref0 = self.uq0  #关键
-        self.deltaU = 0.0495
+        self.deltaU = 0.05
         self.Tstart = 1
         self.Tend = 8
         self.Tstepdelay = 0.02 #不可为0，否则将除以0 
@@ -200,7 +200,7 @@ class Model():
 
 if __name__ == "__main__":
     #读取实测采样波形
-    df = pd.read_csv((os.getcwd()).replace("\\","/")+'/wuqiangxi3step.csv')
+    df = pd.read_csv((os.getcwd()).replace("\\","/")+'/wuqiangxi3step2.csv')
     #df = pd.read_csv('C:/Users/ll/Desktop/xiangtan3.csv')
     #构造仿真数据储存格式
     df2=pd.DataFrame
@@ -219,7 +219,7 @@ if __name__ == "__main__":
 
     #绘图
     plt.plot(meas_t,meas_ug, linewidth = '1', label = "test1", linestyle='-', marker='')
-    plt.plot(model.tmatrix[1,:],model.Ematrix[3,:], linewidth = '3', label = "test2",  linestyle='-')
+    plt.plot(model.tmatrix[1,:],model.Ematrix[3,:], linewidth = '2', label = "test2",  linestyle='--')
     plt.legend(["Measurement","python  Simulation"])
     plt.title("NES5100 device")
     plt.grid()

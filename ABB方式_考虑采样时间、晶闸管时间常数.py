@@ -17,8 +17,8 @@ import  os
 import numpy as np
 import matplotlib.pyplot as plt
 import pandas as pd
-#plt.rcParams['font.sans-serif'] = ['SimHei']  # 步骤一（替换sans-serif字体）
-#plt.rcParams['axes.unicode_minus'] = False   # 步骤二（解决坐标轴负数的负号显示问题）
+plt.rcParams['font.sans-serif'] = ['SimHei']  # 步骤一（替换sans-serif字体）
+plt.rcParams['axes.unicode_minus'] = False   # 步骤二（解决坐标轴负数的负号显示问题）
 
 
 class Model():
@@ -67,10 +67,26 @@ class Model():
         self.a = 1.0
         self.b = 0.186
         self.n = 8.357
+        #控制参数  鸟儿巢1数据
+        self.Tr = 0.02
+        self.TA = 0.01
+        self.K = 18*10.6 #4.69*36 #
+        self.T1 = 1.0
+        self.T2 = 20.0
+        self.T3 = 0.2
+        self.T4 = 0.05
+        #发电机参数 鸟儿巢1数据
+        self.Tq0p = 0.0001
+        self.Td0p = 4.25
+        self.Tq0pp = 0.035   
+        self.Td0pp = 0.042
+        self.a = 1.0
+        self.b = 0.118
+        self.n = 7.1652
 #########################################################################################
         #需求变量定义及初始化
         self.ud0 = 0
-        self.uq0 = 0.9493
+        self.uq0 = 0.76542
         self.Edp0 = 0
         self.Eqp0 = self.uq0
         self.Edpp0 = 0
@@ -78,10 +94,10 @@ class Model():
         self.KG0 = 1 + self.b / self.a * self.Eqpp0**(self.n - 1)
         self.Efd0 = self.uq0 * self.KG0
         self.uref0 = self.Efd0/(self.K*self.uq0)+self.uq0  #关键
-        self.deltaU = 0.05
+        self.deltaU = 0.082
         self.Tstart = 1
         self.Tend = 8
-        self.Tstepdelay = 0.001 #不可为0，否则将除以0
+        self.Tstepdelay = 0.01 #不可为0，否则将除以0
         self.Efd10 = self.uref0-self.uq0
         self.Efd20 = self.Efd0
         self.Efd30 = self.Efd0
@@ -204,7 +220,8 @@ class Model():
 if __name__ == "__main__":
     #读取实测采样波形
     #这里采用了系统还是来得到当前文件的路径，从中将默认的分隔符进行了替换
-    df = pd.read_csv((os.getcwd()).replace("\\","/")+'/xiangtan3step.csv')
+    #df = pd.read_csv((os.getcwd()).replace("\\","/")+'/xiangtan3step.csv')
+    df = pd.read_csv((os.getcwd()).replace("\\","/")+'/niaoerchao1step.csv')
     #构造仿真数据储存格式
     df2=pd.DataFrame
     meas_t = df["t"]
@@ -219,12 +236,13 @@ if __name__ == "__main__":
     #重新构造dataframe的列名
     df2=pd.DataFrame(temp.transpose(),columns=['t','Edp','Eqp','Edpp','Eqpp','Efd1','Efd2','Efd3','Efd4'])
     #dataframe保存时将索引去掉
-    df2.to_csv((os.getcwd()).replace("\\","/")+'/xiangtan3stepsimulate考虑TrTA ABB方式.csv',index=0)
+    #df2.to_csv((os.getcwd()).replace("\\","/")+'/xiangtan3stepsimulate考虑TrTA ABB方式.csv',index=0)
+    df2.to_csv((os.getcwd()).replace("\\","/")+'/niaoerchao1stepsimulate考虑TrTA ABB方式.csv',index=0)
 
     #绘图
     plt.plot(meas_t,meas_ug, linewidth = '1', label = "test1", linestyle='-', marker='')
     plt.plot(model.tmatrix[1,:],model.Ematrix[1,:], linewidth = '3', label = "test2",  linestyle='--')
     plt.legend(["Measurement","python  Simulation"])
-    plt.title("ABB  device")
+    plt.title("鸟儿巢  device")
     plt.grid()
     plt.show()

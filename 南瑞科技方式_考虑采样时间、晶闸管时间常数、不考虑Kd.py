@@ -44,7 +44,7 @@ class Model():
         self.Kv = 0
         self.Kp = 60
         self.Ki = 20
-        self.Kd = 0
+        self.Kd = 1
         self.Td = 0.01
         #将并联PID转化为串联PID
         self.T1 = self.Kp/self.Ki

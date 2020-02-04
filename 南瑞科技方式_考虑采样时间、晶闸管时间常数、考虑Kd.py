@@ -63,7 +63,7 @@ class Model():
         self.Tq0pp = 0.06   
         self.Td0pp = 0.05
         self.a = 1.0
-        self.b = 0.081
+        self.b = 0.11
         self.n = 9.966
 
         # #控制参数 湘潭3数据

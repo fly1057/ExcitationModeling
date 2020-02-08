@@ -41,6 +41,7 @@ class Model():
         self.Tr = 0.01
         self.TA = 0.01
         self.K = 22*7.84
+        self.Kv = 1.0
         self.T1 = 1.0
         self.T2 = 4.0
         self.T3 = 1.0
@@ -105,8 +106,8 @@ class Model():
                            [0 , (1/self.Td0pp-(1 + self.b / self.a * float(self.Evector[3])**(self.n - 1))/self.Td0p),0,-1/self.Td0pp,0,0,0,1/self.Td0p],\
                            [0,0,0,0,-1/self.Tr,0 ,0,0],\
                            [0,0,0,0,self.K/self.TA,-1/self.TA ,0,0],\
-                           [0,0,0,0,self.T1/self.T2*self.K/self.TA,1/self.T2-self.T1/(self.T2*self.TA),-1/self.T2,0],\
-                           [0,0,0,0,self.T1/self.T2*self.T3/self.T4*self.K/self.TA ,self.T3/self.T4*(1/self.T2-self.T1/(self.T2*self.TA)),(1/self.T4-self.T3/(self.T4*self.T2)),-1/self.T4]
+                           [0,0,0,0,self.T1/self.T2*self.K/self.TA,1/self.T2-self.T1/(self.T2*self.TA),-self.Kv/self.T2,0],\
+                           [0,0,0,0,self.T1/self.T2*self.T3/self.T4*self.K/self.TA ,self.T3/self.T4*(1/self.T2-self.T1/(self.T2*self.TA)),(1/self.T4-self.Kv*self.T3/(self.T4*self.T2)),-1/self.T4]
                            ])
         self.B = np.array([0,0,0,0,1,0,0,0]).reshape(-1, 1)
 
@@ -150,9 +151,15 @@ class Model():
 
     def test_f2(self, t, Evector):
 
-        return self.A@Evector+self.B*((self.uref_fun(self.tvector[0])-float(np.sqrt(Evector[2]**2+Evector[3]**2)))/self.Tr+self.duref_fun(self.tvector[0]) )
+        ug = float(np.sqrt(Evector[2]**2+Evector[3]**2))
+        uref = self.uref_fun(self.tvector[0])
+        duref = self.duref_fun(self.tvector[0])
+        temp = (uref-ug)/self.Tr+duref
+
+        return self.A@Evector+self.B*( temp)
 
     def test_calculate2(self):
+        
         try:
             while self.tvector[0] < self.Tend:
                 self.Evector = self.rk4(self.Evector, self.test_f2, self.dtvector, self.tvector)

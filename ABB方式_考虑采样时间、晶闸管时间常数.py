@@ -24,17 +24,10 @@ plt.rcParams['axes.unicode_minus'] = False   # 步骤二（解决坐标轴负数
 class Model():
     def __init__(self):
         super().__init__()
-        self.DefaultParametersetting()
+        self.DataInput()
 
-    def DefaultParametersetting(self):
-        self.dt = 0.01
-        self.t = 0.0
-        self.y = 3.0
-        self.tseq = [0.0]
-        self.yseq = [3.0]
-        self.tseq_original = np.arange(0, 1, 0.01)
-        self.yseq_original = self.tseq_original**3 - self.tseq_original**2 + 3
-########################################################################################
+    def DataInput(self):
+
         # #控制参数  皂市1数据
         # self.Tr = 0.01
         # self.TA = 0.01
@@ -51,10 +44,13 @@ class Model():
         # self.a = 1.0
         # self.b = 0.192
         # self.n = 6.246
-        #控制参数  湘潭3数据
+        #励磁控制参数 湘潭3数据
         self.Tr = 0.02
         self.TA = 0.01
         self.K = 500
+        self.Kv = 1
+        self.ModeFlag = "EXC9000"
+        #如果Kv等于0，那么状态变量需要重新初始化，另外T1之类需要重新计算，其余和串联PID一致
         self.T1 = 1.0
         self.T2 = 8.33
         self.T3 = 1.0
@@ -67,42 +63,56 @@ class Model():
         self.a = 1.0
         self.b = 0.186
         self.n = 8.357
-        #控制参数  鸟儿巢1数据
-        self.Tr = 0.02
-        self.TA = 0.01
-        self.K = 18*10.6 #4.69*36 #
-        self.T1 = 1.0
-        self.T2 = 20.0
-        self.T3 = 0.2
-        self.T4 = 0.05
-        #发电机参数 鸟儿巢1数据
-        self.Tq0p = 0.0001
-        self.Td0p = 4.25
-        self.Tq0pp = 0.035   
-        self.Td0pp = 0.042
-        self.a = 1.0
-        self.b = 0.118
-        self.n = 7.1652
+        # #控制参数  鸟儿巢1数据
+        # self.Tr = 0.02
+        # self.TA = 0.01
+        # self.K = 18*10.6 #4.69*36 #
+        # self.T1 = 1.0
+        # self.T2 = 20.0
+        # self.T3 = 0.2
+        # self.T4 = 0.05
+        # #发电机参数 鸟儿巢1数据
+        # self.Tq0p = 0.0001
+        # self.Td0p = 4.25
+        # self.Tq0pp = 0.035   
+        # self.Td0pp = 0.042
+        # self.a = 1.0
+        # self.b = 0.118
+        # self.n = 7.1652
 #########################################################################################
-        #需求变量定义及初始化
+        #######需求变量定义及初始化###########
+        #发电机变量的初始化
         self.ud0 = 0
-        self.uq0 = 0.76542
+        self.uq0 = 0.9493  
+        #从0.95开始封脉冲计算Td0p不对，必须从线性段封脉冲才行比如0.4左右，从0.7开始误差也比较大
         self.Edp0 = 0
         self.Eqp0 = self.uq0
         self.Edpp0 = 0
         self.Eqpp0 = self.uq0
         self.KG0 = 1 + self.b / self.a * self.Eqpp0**(self.n - 1)
         self.Efd0 = self.uq0 * self.KG0
-        self.uref0 = self.Efd0/(self.K*self.uq0)+self.uq0  #关键
-        self.deltaU = 0.082
-        self.Tstart = 1
-        self.Tend = 8
-        self.Tstepdelay = 0.01 #不可为0，否则将除以0
-        self.Efd10 = self.uref0-self.uq0
-        self.Efd20 = self.Efd0
-        self.Efd30 = self.Efd0
+
+        #励磁状态变量初始化
         self.Efd40 = self.Efd0
-        
+        self.Efd30 = self.Efd40
+        self.Efd20 = self.Kv*self.Efd30
+        self.Efd10 = self.Efd20/self.K
+
+        if self.ModeFlag =="ABB":
+            self.uref0 = self.Kv*self.Efd0/self.K + self.uq0 #EXC9000 初始化关键
+
+        elif self.ModeFlag =="EXC9000":
+            self.uref0 = self.Kv*self.Efd0/(self.K*self.uq0) + self.uq0 #ABB 初始化关键
+
+        elif self.ModeFlag =="NES5000":
+            self.uref0 = self.Kv*self.Efd0/(self.K*self.uq0) + self.uq0 #ABB 初始化关键
+
+        #阶跃变量初始化
+        self.deltaU = 0.0498  #不影响封脉冲
+        self.Tstart = 1
+        self.Tend = 20
+        self.Tstepdelay = 0.02 #不可为0，否则将除以0
+
         #快速形成列向量的方法
         self.dtvector = np.array([0.01]*8).reshape(-1,1)
         self.tvector = np.array([0]*8).reshape(-1,1)
@@ -111,7 +121,7 @@ class Model():
         self.Evector = np.array([self.Edp0, self.Eqp0, self.Edpp0,self.Eqpp0,self.Efd10,self.Efd20,self.Efd30,self.Efd40]).reshape(-1, 1)  #[Edp,Eqp,Edpp,Eqpp]
         self.Ematrix = self.Evector
 
-        self.pEvector = np.array([0]*8).reshape(-1, 1)  #-1表示我懒得计算该填什么数字，由python通过原数组和其他的值3推测出来。
+        self.pEvector = np.array([0]*8).reshape(-1, 1)  #-1表示懒得计算该填什么数字，由python通过原数组和其他的值推测出来。
         self.pEmatrix = self.pEvector
 
         self.A = np.array([[-1/self.Tq0p , 0,0,0,0,0,0,0],\
@@ -120,9 +130,10 @@ class Model():
                            [0 , (1/self.Td0pp-(1 + self.b / self.a * float(self.Evector[3])**(self.n - 1))/self.Td0p),0,-1/self.Td0pp,0,0,0,1/self.Td0p],\
                            [0,0,0,0,-1/self.Tr,0 ,0,0],\
                            [0,0,0,0,self.K/self.TA,-1/self.TA ,0,0],\
-                           [0,0,0,0,self.T1/self.T2*self.K/self.TA,1/self.T2-self.T1/(self.T2*self.TA),-1/self.T2,0],\
-                           [0,0,0,0,self.T1/self.T2*self.T3/self.T4*self.K/self.TA ,self.T3/self.T4*(1/self.T2-self.T1/(self.T2*self.TA)),(1/self.T4-self.T3/(self.T4*self.T2)),-1/self.T4]
+                           [0,0,0,0,self.T1/self.T2*self.K/self.TA,1/self.T2-self.T1/(self.T2*self.TA),-self.Kv/self.T2,0],\
+                           [0,0,0,0,self.T1/self.T2*self.T3/self.T4*self.K/self.TA ,self.T3/self.T4*(1/self.T2-self.T1/(self.T2*self.TA)),(1/self.T4-self.Kv*self.T3/(self.T4*self.T2)),-1/self.T4]
                            ])
+        
         self.B = np.array([0,0,0,0,1,0,0,0]).reshape(-1, 1)
 
         print("A = \n",self.A)
@@ -145,8 +156,9 @@ class Model():
             temp = self.uref0
         elif t<self.Tstart+self.Tstepdelay:
             temp = self.uref0 + self.deltaU*(t-self.Tstart)/self.Tstepdelay
-        else :#这边瞬间上升有点问题
+        else :
             temp = self.uref0 + self.deltaU
+
         return temp
 
     def duref_fun(self,t):
@@ -155,8 +167,9 @@ class Model():
             temp = 0
         elif t<self.Tstart+self.Tstepdelay:
             temp = self.deltaU/self.Tstepdelay
-        else :#这边瞬间上升有点问题
+        else :
             temp = 0
+
         return temp
 
     def test_f(self, t, y):
@@ -173,20 +186,39 @@ class Model():
         ug = float(np.sqrt(Edpp**2+Eqpp**2))
         uref = self.uref_fun(self.tvector[0])
         duref = self.duref_fun(self.tvector[0])
-        
-        temp = (uref*ug-ug**2)/self.Tr
-        + ug*duref + \
-            uref/ug*( \
-            (1/self.Tq0pp - 1/self.Tq0p)*Edp - \
-            1/self.Tq0p*Edpp + \
-            (1/self.Td0pp -  (1 + self.b / self.a * float(Eqpp)**(self.n - 1)))/self.Td0p*Eqp- \
-            1/self.Td0pp*Eqpp+1/self.Td0p*Efd)
+
+        if self.ModeFlag =="ABB":
+            tempABB = (uref*ug-ug**2)/self.Tr + \
+                ug*duref + \
+                uref/ug*( \
+                (1/self.Tq0pp - 1/self.Tq0p)*Edp - \
+                1/self.Tq0pp*Edpp + \
+                (1/self.Td0pp - (1 + self.b / self.a * float(Eqpp)**(self.n - 1))/self.Td0p) *Eqp - \
+                1/self.Td0pp*Eqpp + \
+                1/self.Td0p*Efd)
+            temp = tempABB
+
+        elif self.ModeFlag =="EXC9000":
+            tempEXC9000 = (uref-ug)/self.Tr+duref
+            temp = tempEXC9000
+
+        elif self.ModeFlag =="NES5000":
+            tempNES5000 = (uref-ug)/self.Tr+duref
+            temp = tempNES5000
+
+        #用于模拟封脉冲，让所有的控制不起作用，仅让电机本体起作用，在这里B阵乘的应该为0
         return self.A@Evector+self.B*(temp)
 
     def test_calculate2(self):#实现利用rk4进行计算，然后更新各向量或者矩阵
         try:
             while self.tvector[0] < self.Tend:
             #rk4的格式为rk4( y, f, dt, t)
+                ############################用于模拟封脉冲
+                # self.Evector[4] = 0
+                # self.Evector[5] = 0
+                # self.Evector[6] = 0
+                # self.Evector[7] = 0
+                ############################用于模拟封脉冲
                 self.Evector = self.rk4(self.Evector, self.test_f2, self.dtvector, self.tvector)
                 self.Ematrix = np.hstack((self.Ematrix,self.Evector))
                 self.tvector = self.tvector + self.dtvector
@@ -220,8 +252,8 @@ class Model():
 if __name__ == "__main__":
     #读取实测采样波形
     #这里采用了系统还是来得到当前文件的路径，从中将默认的分隔符进行了替换
-    #df = pd.read_csv((os.getcwd()).replace("\\","/")+'/xiangtan3step.csv')
-    df = pd.read_csv((os.getcwd()).replace("\\","/")+'/niaoerchao1step.csv')
+    df = pd.read_csv((os.getcwd()).replace("\\","/")+'/xiangtan3step.csv')
+    #df = pd.read_csv((os.getcwd()).replace("\\","/")+'/niaoerchao1step.csv')
     #构造仿真数据储存格式
     df2=pd.DataFrame
     meas_t = df["t"]
@@ -236,13 +268,16 @@ if __name__ == "__main__":
     #重新构造dataframe的列名
     df2=pd.DataFrame(temp.transpose(),columns=['t','Edp','Eqp','Edpp','Eqpp','Efd1','Efd2','Efd3','Efd4'])
     #dataframe保存时将索引去掉
-    #df2.to_csv((os.getcwd()).replace("\\","/")+'/xiangtan3stepsimulate考虑TrTA ABB方式.csv',index=0)
-    df2.to_csv((os.getcwd()).replace("\\","/")+'/niaoerchao1stepsimulate考虑TrTA ABB方式.csv',index=0)
+    df2.to_csv((os.getcwd()).replace("\\","/")+'/xiangtan3stepsimulate考虑TrTA ABB方式.csv',index=0)
+    #df2.to_csv((os.getcwd()).replace("\\","/")+'/niaoerchao1stepsimulate考虑TrTA ABB方式.csv',index=0)
 
     #绘图
     plt.plot(meas_t,meas_ug, linewidth = '1', label = "test1", linestyle='-', marker='')
-    plt.plot(model.tmatrix[1,:],model.Ematrix[1,:], linewidth = '3', label = "test2",  linestyle='--')
-    plt.legend(["Measurement","python  Simulation"])
-    plt.title("鸟儿巢  device")
+    plt.plot(model.tmatrix[1,:],model.Ematrix[1,:], linewidth = '2', label = "test2",  linestyle='--')
+    #plt.plot(model.tmatrix[1,:],model.Ematrix[7,:], linewidth = '2', label = "test2",  linestyle='--')
+    plt.legend(["Measurement Ug","Simulation Ug","Simulation Efd"])
+    plt.title("湘潭3 ABB5000 ")
+    plt.xlabel("t/s")
+    plt.ylabel("Ut/p.u.")
     plt.grid()
     plt.show()

@@ -1,0 +1,51 @@
+        # #控制参数  皂市1数据
+        # self.Tr = 0.01
+        # self.TA = 0.01
+        # self.K = 22*7.84
+        # self.T1 = 1.0
+        # self.T2 = 4.0
+        # self.T3 = 1.0
+        # self.T4 = 1.0
+        # #发电机参数 皂市1数据
+        # self.Tq0p = 0.2
+        # self.Td0p = 9.45
+        # self.Tq0pp = 0.198   #0.198
+        # self.Td0pp = 0.091
+        # self.a = 1.0
+        # self.b = 0.192
+        # self.n = 6.246
+        #励磁控制参数 湘潭3数据 
+        # self.Tr = 0.02
+        # self.TA = 0.01
+        # self.K = 500
+        # self.Kv = 1
+        # self.ExciterType = "EXC9000"
+        #如果Kv等于0，那么状态变量需要重新初始化，另外T1之类需要重新计算，其余和串联PID一致
+        # self.T1 = 1.0
+        # self.T2 = 8.33
+        # self.T3 = 1.0
+        # self.T4 = 1.0
+        #发电机参数 湘潭3数据
+        # self.Tq0p = 0.95
+        # self.Td0p = 9.32
+        # self.Tq0pp = 0.069   
+        # self.Td0pp = 0.045
+        # self.a = 1.0
+        # self.b = 0.186
+        # self.n = 8.357
+        # #控制参数  鸟儿巢1数据
+        # self.Tr = 0.02
+        # self.TA = 0.01
+        # self.K = 18*10.6 #4.69*36 #
+        # self.T1 = 1.0
+        # self.T2 = 20.0
+        # self.T3 = 0.2
+        # self.T4 = 0.05
+        # #发电机参数 鸟儿巢1数据
+        # self.Tq0p = 0.0001
+        # self.Td0p = 4.25
+        # self.Tq0pp = 0.035   
+        # self.Td0pp = 0.042
+        # self.a = 1.0
+        # self.b = 0.118
+        # self.n = 7.1652

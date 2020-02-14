@@ -47,7 +47,7 @@ class Model():
         self.T3 = 1.0
         self.T4 = 1.0
         #发电机参数 皂市1数据
-        self.Tq0p = 0.2
+        self.Tq0p = 0.001
         self.Td0p = 9.45
         self.Tq0pp = 0.198   #0.198
         self.Td0pp = 0.091
@@ -73,7 +73,7 @@ class Model():
 #########################################################################################
         #需求变量定义及初始化
         self.ud0 = 0
-        self.uq0 = 0.95
+        self.uq0 = 0.9514
         self.Edp0 = 0
         self.Eqp0 = self.uq0
         self.Edpp0 = 0

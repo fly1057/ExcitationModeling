@@ -252,18 +252,24 @@ if __name__ == "__main__":
     # model.DisturbanceInitial(0.0498,1,1.1,0.02)#0.04985
     # model.CalculateInitial(0.95,0.001)
     # #############碗米坡3号机####################
-    # #############五强溪3号机####################
-    # model.ExciterInitial(0.01,0.01,1,0,"NES5000",60,20,1,0.01)#TA和Tr用0.02误差很大，用0.01,0.01行
-    # model.GeneratorInitial(0.0001,8.37,0.06,0.05,1,0.081,9.966)
+    #############五强溪3号机####################
+    model.ExciterInitial(0.01,0.01,1,0,"NES5000",60,20,1,0.01)#TA和Tr用0.02误差很大，用0.01,0.01行
+    model.GeneratorInitial(0.0001,8.37,0.06,0.05,1,0.081,9.966)
+    model.DisturbanceInitial(0.0498,1,5,0.01)#0.04985
+    model.CalculateInitial(0.95,0.001)
+    #############五强溪3号机####################
+    # #############皂市1号机####################
+    # model.ExciterInitial(0.01,0.01,22*7.84,1,"ABB",1,4,1,1)#TA和Tr用0.02误差很大，用0.01,0.01行
+    # model.GeneratorInitial(0.001,9.45,0.198,0.091,1,0.192,6.246)
+    # model.DisturbanceInitial(0.0481,1.018,5,0.01)#0.04985
+    # model.CalculateInitial(0.95,0.005)
+    ##############皂市1号机####################
+    # #############黔东1号机####################
+    # model.ExciterInitial(0.01,0.01,1,0,"NES5000",60,10,0,0.01)#TA和Tr用0.02误差很大，用0.01,0.01行
+    # model.GeneratorInitial(0.94,7.47,0.069,0.045,1,0.0605,13.646)
     # model.DisturbanceInitial(0.0498,1,5,0.01)#0.04985
     # model.CalculateInitial(0.95,0.001)
-    # #############五强溪3号机####################
-    # #############皂市1号机####################
-    model.ExciterInitial(0.01,0.01,22*7.84,1,"ABB",1,4,1,1)#TA和Tr用0.02误差很大，用0.01,0.01行
-    model.GeneratorInitial(0.001,9.45,0.198,0.091,1,0.192,6.246)
-    model.DisturbanceInitial(0.0481,1.018,5,0.01)#0.04985
-    model.CalculateInitial(0.95,0.005)
-    # #############皂市1号机####################
+    # #############黔东1号机####################
     model.Calculate()
     #计算后仿真结果保存csv，这里利用了vstack这个函数，很方便的进行列矩阵的构造
     temp = np.vstack((model.tmatrix[1,:],model.Ematrix))#列向量横向拼凑
@@ -271,7 +277,6 @@ if __name__ == "__main__":
     df_simulation=pd.DataFrame(temp.transpose(),columns=['t','Edp','Eqp','Edpp','Eqpp','Efd1','Efd2','Efd3','Efd4'])
     #dataframe保存时将索引去掉
     df_simulation.to_csv((os.getcwd()).replace("\\","/")+'/stepsimulatetemp.csv',index=0)
-    #df2.to_csv((os.getcwd()).replace("\\","/")+'/niaoerchao1stepsimulate考虑TrTA ABB方式.csv',index=0)
 
     #绘图
     plt.plot(meas_t,meas_ug, linewidth = '1', label = "test1", linestyle='-', marker='')

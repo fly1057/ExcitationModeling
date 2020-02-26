@@ -12,6 +12,8 @@ Efd1 ,Efd2 ,Efd3 ,Efd4为由于励磁PID导致的状态变量
 (1)对E,U初始化
 (2)对式（1-1）调用龙格库塔计算E，所有的变量都是E或者E中的量，这样才能进行龙格库塔计算，因为只有E一个变量
 
+黔东的计算不对，有两个原因一种是采用了MF卡的方程，另外一种是采用了MG卡的方程
+
 '''
 import  os
 import numpy as np
@@ -234,7 +236,8 @@ if __name__ == "__main__":
     #df_measurement = pd.read_csv((os.getcwd()).replace("\\","/")+'/xiangtan3step.csv')
     #df = pd.read_csv((os.getcwd()).replace("\\","/")+'/niaoerchao1step.csv')
     #df_measurement = pd.read_csv((os.getcwd()).replace("\\","/")+'/wanmipo3step.csv')
-    df_measurement = pd.read_csv((os.getcwd()).replace("\\","/")+'/zaoshi1step.csv')
+    df_measurement = pd.read_csv((os.getcwd()).replace("\\","/")+'/qiandong1step.csv')
+    # df_measurement = pd.read_csv((os.getcwd()).replace("\\","/")+'/zaoshi1step.csv')
     #构造仿真数据储存格式
     meas_t = df_measurement["t"]
     meas_ug = df_measurement["UAB"]
@@ -246,30 +249,36 @@ if __name__ == "__main__":
     # model.DisturbanceInitial(0.04985,1,6,0.02)
     # model.CalculateInitial(0.9493,0.0005)
     ############湘潭3号机#####################
-    # #############碗米坡3号机####################
+    #############碗米坡3号机####################
     # model.ExciterInitial(0.01,0.01,500,1,"ABB",0.01,0.0025,1.5,15)#TA和Tr用0.02误差很大，用0.01,0.01行
     # model.GeneratorInitial(0.001,5.36,0.068,0.0466,1,0.141,7.386)
-    # model.DisturbanceInitial(0.0498,1,1.1,0.02)#0.04985
+    # model.DisturbanceInitial(0.05,1,6,0.02)#0.04985
     # model.CalculateInitial(0.95,0.001)
-    # #############碗米坡3号机####################
+    #############碗米坡3号机####################
     #############五强溪3号机####################
-    model.ExciterInitial(0.01,0.01,1,0,"NES5000",60,20,1,0.01)#TA和Tr用0.02误差很大，用0.01,0.01行
-    model.GeneratorInitial(0.0001,8.37,0.06,0.05,1,0.081,9.966)
-    model.DisturbanceInitial(0.0498,1,5,0.01)#0.04985
-    model.CalculateInitial(0.95,0.001)
+    # model.ExciterInitial(0.01,0.01,1,0,"NES5000",60,20,1,0.01)#TA和Tr用0.02误差很大，用0.01,0.01行
+    # model.GeneratorInitial(0.0001,8.37,0.06,0.05,1,0.081,9.966)
+    # model.DisturbanceInitial(0.0498,1,5,0.01)#0.04985
+    # model.CalculateInitial(0.95,0.001)
     #############五强溪3号机####################
-    # #############皂市1号机####################
+    # ###############皂市1号机####################
     # model.ExciterInitial(0.01,0.01,22*7.84,1,"ABB",1,4,1,1)#TA和Tr用0.02误差很大，用0.01,0.01行
     # model.GeneratorInitial(0.001,9.45,0.198,0.091,1,0.192,6.246)
     # model.DisturbanceInitial(0.0481,1.018,5,0.01)#0.04985
     # model.CalculateInitial(0.95,0.005)
-    ##############皂市1号机####################
-    # #############黔东1号机####################
-    # model.ExciterInitial(0.01,0.01,1,0,"NES5000",60,10,0,0.01)#TA和Tr用0.02误差很大，用0.01,0.01行
-    # model.GeneratorInitial(0.94,7.47,0.069,0.045,1,0.0605,13.646)
-    # model.DisturbanceInitial(0.0498,1,5,0.01)#0.04985
-    # model.CalculateInitial(0.95,0.001)
-    # #############黔东1号机####################
+    # ##############皂市1号机####################
+    # #############凌津滩5号机####################
+    # model.ExciterInitial(0.01,0.01,500,1,"ABB",0.01,0.0025,1.5,15)#TA和Tr用0.02误差很大，用0.01,0.01行
+    # model.GeneratorInitial(0.001,3.1,0.03,0.02,1,0.245,6.225)
+    # model.DisturbanceInitial(0.05,1.02,5,0.01)#0.04985
+    # model.CalculateInitial(0.95,0.005)
+    ##############凌津滩5号机####################
+    #############黔东1号机####################
+    model.ExciterInitial(0.01,0.01,1,0,"NES5000",60,10,0,0.01)#TA和Tr用0.02误差很大，用0.01,0.01行
+    model.GeneratorInitial(0.94,7.47,0.069,0.045,1,0.0605,13.646)
+    model.DisturbanceInitial(0.0498,1,5,0.01)#0.04985
+    model.CalculateInitial(0.95,0.001)
+    #############黔东1号机####################
     model.Calculate()
     #计算后仿真结果保存csv，这里利用了vstack这个函数，很方便的进行列矩阵的构造
     temp = np.vstack((model.tmatrix[1,:],model.Ematrix))#列向量横向拼凑

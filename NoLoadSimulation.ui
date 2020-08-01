@@ -66,19 +66,6 @@
      </property>
     </widget>
    </widget>
-   <widget class="QDialogButtonBox" name="buttonBox">
-    <property name="geometry">
-     <rect>
-      <x>610</x>
-      <y>530</y>
-      <width>156</width>
-      <height>23</height>
-     </rect>
-    </property>
-    <property name="standardButtons">
-     <set>QDialogButtonBox::Cancel|QDialogButtonBox::Ok</set>
-    </property>
-   </widget>
    <widget class="QTabWidget" name="tabWidget">
     <property name="geometry">
      <rect>
@@ -101,7 +88,7 @@
         <x>10</x>
         <y>10</y>
         <width>421</width>
-        <height>100</height>
+        <height>108</height>
        </rect>
       </property>
       <layout class="QGridLayout" name="gridLayout">
@@ -384,7 +371,7 @@
      <x>0</x>
      <y>0</y>
      <width>971</width>
-     <height>23</height>
+     <height>18</height>
     </rect>
    </property>
   </widget>

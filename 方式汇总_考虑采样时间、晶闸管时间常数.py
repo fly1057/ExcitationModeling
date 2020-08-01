@@ -19,8 +19,8 @@ import  os
 import numpy as np
 import matplotlib.pyplot as plt
 import pandas as pd
-plt.rcParams['font.sans-serif'] = ['SimHei']  # 步骤一（替换sans-serif字体）
-plt.rcParams['axes.unicode_minus'] = False   # 步骤二（解决坐标轴负数的负号显示问题）
+#plt.rcParams['font.sans-serif'] = ['SimHei']  # 步骤一（替换sans-serif字体）
+#plt.rcParams['axes.unicode_minus'] = False   # 步骤二（解决坐标轴负数的负号显示问题）
 
 
 class Model():
@@ -118,9 +118,10 @@ class Model():
             self.x1 = (-self.bx + np.sqrt((self.bx)**2-4*self.ax*self.cx))/(2*self.ax)
             self.x2 = (-self.bx - np.sqrt((self.bx)**2-4*self.ax*self.cx))/(2*self.ax)
             self.T1 = -1/self.x1
-            self.T2 = 1/self.Ki
-            self.T3 = -1/self.x2
+            self.T2 = 1/self.Ki 
+            self.T3 = -1/self.x2 
             self.T4 = self.Td
+            
 
 
     def GeneratorInitial(self,Tq0p,Td0p,Tq0pp,Td0pp,a,b,n):
@@ -233,21 +234,30 @@ class Model():
 if __name__ == "__main__":
     #读取实测采样波形
     #这里采用了系统还是来得到当前文件的路径，从中将默认的分隔符进行了替换
-    #df_measurement = pd.read_csv((os.getcwd()).replace("\\","/")+'/xiangtan3step.csv')
-    #df = pd.read_csv((os.getcwd()).replace("\\","/")+'/niaoerchao1step.csv')
-    #df_measurement = pd.read_csv((os.getcwd()).replace("\\","/")+'/wanmipo3step.csv')
-    df_measurement = pd.read_csv((os.getcwd()).replace("\\","/")+'/qiandong1step.csv')
-    # df_measurement = pd.read_csv((os.getcwd()).replace("\\","/")+'/zaoshi1step.csv')
+    #df_measurement = pd.read_csv((os.getcwd()).replace("\\","/")+'/data/xiangtan3step.csv')
+    #df = pd.read_csv((os.getcwd()).replace("\\","/")+'/data/niaoerchao1step.csv')
+    #df_measurement = pd.read_csv((os.getcwd()).replace("\\","/")+'/data/wanmipo3step.csv')
+    # df_measurement = pd.read_csv((os.getcwd()).replace("\\","/")+'/data/wuqiangxi3step.csv')
+    #df_measurement = pd.read_csv((os.getcwd()).replace("\\","/")+'/data/qiandong1step.csv')
+    # df_measurement = pd.read_csv((os.getcwd()).replace("\\","/")+'/data/zaoshi1step.csv')
+    # df_measurement = pd.read_csv((os.getcwd()).replace("\\","/")+'/data/baishi2step.csv')
+    #df_measurement = pd.read_csv((os.getcwd()).replace("\\","/")+'/data/dayuandu2step.csv')
+    #df_measurement = pd.read_csv((os.getcwd()).replace("\\","/")+'/data/sanbanxi1step.csv')
+    #df_measurement = pd.read_csv((os.getcwd()).replace("\\","/")+'/data/yueyanglaji1step.csv')  
+    #df_measurement = pd.read_csv((os.getcwd()).replace("\\","/")+'/data/leiyang3step.csv')
+    df_measurement = pd.read_csv((os.getcwd()).replace("\\","/")+'/data/yiyang1step.csv')
     #构造仿真数据储存格式
     meas_t = df_measurement["t"]
     meas_ug = df_measurement["UAB"]
 
     model = Model()
-    #############湘潭3号机####################
-    # model.ExciterInitial(0.01,0.01,500,1,"EXC9000",1,8.33,1.0,1.0)
-    # model.GeneratorInitial(0.95,9.32,0.069,0.045,1,0.186,8.357)
-    # model.DisturbanceInitial(0.04985,1,6,0.02)
-    # model.CalculateInitial(0.9493,0.0005)
+
+    #################声明################
+    #def ExciterInitial(self,Tr,TA,K,Kv,ExciterType,T1,T2,T3,T4)
+    #def GeneratorInitial(self,Tq0p,Td0p,Tq0pp,Td0pp,a,b,n)
+    #def DisturbanceInitial(self,DeltaU,Tstart,Tend,Tstepdelay)
+    #def CalculateInitial(self,InitialUg,Stepdt)
+    #####################################
     ############湘潭3号机#####################
     #############碗米坡3号机####################
     # model.ExciterInitial(0.01,0.01,500,1,"ABB",0.01,0.0025,1.5,15)#TA和Tr用0.02误差很大，用0.01,0.01行
@@ -256,10 +266,10 @@ if __name__ == "__main__":
     # model.CalculateInitial(0.95,0.001)
     #############碗米坡3号机####################
     #############五强溪3号机####################
-    # model.ExciterInitial(0.01,0.01,1,0,"NES5000",60,20,1,0.01)#TA和Tr用0.02误差很大，用0.01,0.01行
+    # model.ExciterInitial(0.01,0.01,1.2,0,"NES5000",60,20,1,0.01)#TA和Tr用0.02误差很大，用0.01,0.01行
     # model.GeneratorInitial(0.0001,8.37,0.06,0.05,1,0.081,9.966)
     # model.DisturbanceInitial(0.0498,1,5,0.01)#0.04985
-    # model.CalculateInitial(0.95,0.001)
+    # model.CalculateInitial(0.95,0.001)  
     #############五强溪3号机####################
     # ###############皂市1号机####################
     # model.ExciterInitial(0.01,0.01,22*7.84,1,"ABB",1,4,1,1)#TA和Tr用0.02误差很大，用0.01,0.01行
@@ -273,12 +283,53 @@ if __name__ == "__main__":
     # model.DisturbanceInitial(0.05,1.02,5,0.01)#0.04985
     # model.CalculateInitial(0.95,0.005)
     ##############凌津滩5号机####################
-    #############黔东1号机####################
-    model.ExciterInitial(0.01,0.01,1,0,"NES5000",60,10,0,0.01)#TA和Tr用0.02误差很大，用0.01,0.01行
-    model.GeneratorInitial(0.94,7.47,0.069,0.045,1,0.0605,13.646)
-    model.DisturbanceInitial(0.0498,1,5,0.01)#0.04985
-    model.CalculateInitial(0.95,0.001)
-    #############黔东1号机####################
+    # #############黔东1号机####################
+    # model.ExciterInitial(0.01,0.01,1,0,"NES5000",60,10,0,0.01)#TA和Tr用0.02误差很大，用0.01,0.01行
+    # model.GeneratorInitial(0.94,7.47,0.069,0.045,1,0.0605,13.646)
+    # model.DisturbanceInitial(0.0498,1,5,0.01)#0.04985
+    # model.CalculateInitial(0.95,0.001)
+    # #############黔东1号机####################
+    #############白市2号机####################
+    # model.ExciterInitial(0.01,0.01,1,0,"NES5000",90,30,0,0.01)#TA和Tr用0.02误差很大，用0.01,0.01行
+    # model.GeneratorInitial(0.1,7.24,0.121,0.055,1,0.129,6.89)
+    # model.DisturbanceInitial(0.0498,1,5,0.01)#0.04985
+    # model.CalculateInitial(0.9518,0.001)
+    #############白市2号机####################
+    #############大源渡2号机####################
+    #model.ExciterInitial(0.01,0.01,22*4,1,"EXC9000",1,4,1.0,1.0)
+    #model.GeneratorInitial(0.0001,3.5,0.024,0.06,1,0.113,8.445)
+    #model.DisturbanceInitial(0.05,1,6,0.02)
+    #model.CalculateInitial(0.95,0.0005)
+    #############################################
+    ##############三板溪1号机####################
+    #model.ExciterInitial(0.01,0.01,300/1.12,1,"ABB",1,6.667 ,1.0,1.0)
+    #model.GeneratorInitial(0.001,11.2,0.04,0.06,1,0.075,9.472)
+    #model.DisturbanceInitial(0.050,1,6,0.02)
+    #model.CalculateInitial(0.95,0.005)
+    #############################################
+    #############岳阳垃圾1号机####################
+    #model.ExciterInitial(0.01,0.01,50*8.62,1,"ABB",1,8.33 ,1.0,1.0)
+    #model.GeneratorInitial(0.95,10.1,0.04,0.06,1,0.12,8.58)
+    #model.DisturbanceInitial(0.0503,1,6,0.02)
+    #model.CalculateInitial(0.95,0.005)
+    ############################################# 
+    ###############耒阳3号机####################  
+    #model.ExciterInitial(0.01,0.01,500,1,"ABB",1.8, 11.25 ,1.0,1.0)
+    #model.GeneratorInitial(0.94,8.19,0.079,0.045,1,0.135,10.4)
+    #model.DisturbanceInitial(0.0493,1,6,0.01)
+    #model.CalculateInitial(0.95,0.002)
+    ##############益阳1号机####################  
+    model.ExciterInitial(0.01,0.01,40*1.875*9.3,1,"EXC9000",3, 30 ,1.0,1.0)
+    model.GeneratorInitial(0.94,9.2,0.079,0.035,1,0.129,8.124)
+    model.DisturbanceInitial(0.05,1.02,10,0.01)
+    model.CalculateInitial(0.95,0.002)
+    #################声明################
+    #def ExciterInitial(self,Tr,TA,K,Kv,ExciterType,T1,T2,T3,T4)
+    #def GeneratorInitial(self,Tq0p,Td0p,Tq0pp,Td0pp,a,b,n)
+    #def DisturbanceInitial(self,DeltaU,Tstart,Tend,Tstepdelay)
+    #def CalculateInitial(self,InitialUg,Stepdt)
+    #####################################
+    
     model.Calculate()
     #计算后仿真结果保存csv，这里利用了vstack这个函数，很方便的进行列矩阵的构造
     temp = np.vstack((model.tmatrix[1,:],model.Ematrix))#列向量横向拼凑
@@ -292,8 +343,10 @@ if __name__ == "__main__":
     plt.plot(model.tmatrix[1,:],model.Ematrix[1,:], linewidth = '2', label = "test2",  linestyle='--')
     #plt.plot(model.tmatrix[1,:],model.Ematrix[7,:], linewidth = '2', label = "test2",  linestyle='--')
     plt.legend(["Measurement Ug","Simulation Ug","Simulation Efd"])
-    plt.title("仿真与实测对比 ")
+    plt.title("Measurement and Simulation ")
     plt.xlabel("t/s")
     plt.ylabel("Ut/p.u.")
     plt.grid()
     plt.show()
+
+    

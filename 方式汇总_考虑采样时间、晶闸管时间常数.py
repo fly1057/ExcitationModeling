@@ -161,7 +161,7 @@ class Model():
         k3 = f(t + dt / 2, y + dt / 2 * k2)
         k4 = f(t + dt, y + dt * k3)
         ynext = y + dt / 6.0 * (k1 + 2 * k2 + 2 * k3 + k4)
-        return ynext
+        return ynext 
 
     #uref的定义和duref的定义也很有意思
     def uref_fun(self,t):

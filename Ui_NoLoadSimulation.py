@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-# Form implementation generated from reading ui file '/home/fly1057/桌面/ExcitationModeling/NoLoadSimulation.ui'
+# Form implementation generated from reading ui file '/home/fly1057/Documents/python_projects/ExcitationModeling/NoLoadSimulation.ui'
 #
 # Created by: PyQt5 UI code generator 5.9.2
 #
@@ -32,7 +32,7 @@ class Ui_MainWindow(object):
         self.tab = QtWidgets.QWidget()
         self.tab.setObjectName("tab")
         self.layoutWidget = QtWidgets.QWidget(self.tab)
-        self.layoutWidget.setGeometry(QtCore.QRect(10, 10, 421, 108))
+        self.layoutWidget.setGeometry(QtCore.QRect(10, 10, 421, 112))
         self.layoutWidget.setObjectName("layoutWidget")
         self.gridLayout = QtWidgets.QGridLayout(self.layoutWidget)
         self.gridLayout.setContentsMargins(0, 0, 0, 0)
@@ -140,7 +140,7 @@ class Ui_MainWindow(object):
         self.tab_2 = QtWidgets.QWidget()
         self.tab_2.setObjectName("tab_2")
         self.layoutWidget1 = QtWidgets.QWidget(self.tab_2)
-        self.layoutWidget1.setGeometry(QtCore.QRect(10, 20, 271, 81))
+        self.layoutWidget1.setGeometry(QtCore.QRect(10, 20, 271, 83))
         self.layoutWidget1.setObjectName("layoutWidget1")
         self.gridLayout_2 = QtWidgets.QGridLayout(self.layoutWidget1)
         self.gridLayout_2.setContentsMargins(0, 0, 0, 0)
@@ -193,7 +193,7 @@ class Ui_MainWindow(object):
         self.tabWidget.addTab(self.tab_5, "")
         MainWindow.setCentralWidget(self.centralwidget)
         self.menubar = QtWidgets.QMenuBar(MainWindow)
-        self.menubar.setGeometry(QtCore.QRect(0, 0, 971, 18))
+        self.menubar.setGeometry(QtCore.QRect(0, 0, 971, 20))
         self.menubar.setObjectName("menubar")
         MainWindow.setMenuBar(self.menubar)
         self.statusbar = QtWidgets.QStatusBar(MainWindow)
